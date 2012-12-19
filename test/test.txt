@@ -1,5 +1,0 @@
-:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
-:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
-:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
-:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
-:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
