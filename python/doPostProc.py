@@ -1,7 +1,5 @@
 from ROOT import *
 gROOT.SetBatch(1)
-#gROOT.LoadMacro("plotlib.so")
-#from ROOT import Plot
 from LJMet.Com.Sample import samplesForPlotting as samples
 from tdrStyle import *
 setTDRStyle()
@@ -10,36 +8,18 @@ gStyle.SetOptStat(False)
 DEBUG=False
 
 inputDir='/uscms_data/d1/jstupak/analysisOutputs/'
-#inputDir+='2012_12_11/newDataTest_fixedZJetsFileList_noTrackerMu'
 inputDir+='2012_12_16/newEventSelTest'
 
-#inputDir='/uscms_data/d2/dsperka/8TeV/Samples/09Dec' #DAVID
-
 bJetRequirements=['0p','0','1','1p','2p']
-#bJetRequirements=['0p','1p','2p']
-#bJetRequirements=['0p']
 
 channels=['el','mu']
-#channels=['el']
-#channels=['mu']
 
 doCutTable=True
-
 doFracFit=True
     
 outputName=inputDir+'/plots.root'
 
-QCDFrac={}
-QCDFracUnc={}
-fitChi2={}
-fitNDF={}
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-#elLumi=5829.0
-#muLumi=5747.0
-
-#elLumi=7460.612 #DCS ONLY
-#muLumi=13209.733 #DCS ONLY
 
 elLumi=6732.0
 muLumi=12211.0
@@ -63,6 +43,11 @@ otherSigmaFracUnc = 0.20
 
 output=TFile(outputName,"RECREATE")
 bkgdNorms={}
+QCDFrac={}
+QCDFracUnc={}
+fakeRate={}
+fitChi2={}
+fitNDF={}
 
 class WPrimePlot:
     
@@ -72,13 +57,11 @@ class WPrimePlot:
         if not QCDFrac.has_key(self.nB):
             QCDFrac[self.nB]={}
             QCDFracUnc[self.nB]={}
+            fakeRate[self.nB]={}
             fitChi2[self.nB]={}
             fitNDF[self.nB]={}
                       
     def Prepare(self):
-        if DEBUG: print 'in Prepare'
-        
-        print self.name
         result={}
         
         cuts=sharedSelectionCuts
@@ -98,18 +81,19 @@ class WPrimePlot:
         elif self.nB=="2p":
             #bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)>=2)'
             bTagCut='((jet_0_tag_WprimeCalc==1 && (jet_1_tag_WprimeCalc + jet_2_tag_WprimeCalc + jet_3_tag_WprimeCalc + jet_4_tag_WprimeCalc + jet_5_tag_WprimeCalc + jet_6_tag_WprimeCalc + jet_7_tag_WprimeCalc + jet_8_tag_WprimeCalc + jet_9_tag_WprimeCalc) >= 1 ) || (jet_1_tag_WprimeCalc==1 && (jet_0_tag_WprimeCalc + jet_2_tag_WprimeCalc + jet_3_tag_WprimeCalc + jet_4_tag_WprimeCalc + jet_5_tag_WprimeCalc + jet_6_tag_WprimeCalc + jet_7_tag_WprimeCalc + jet_8_tag_WprimeCalc + jet_9_tag_WprimeCalc) >= 1))'
-            
+
+        #make name unique
         self.name+='_nB'+self.nB+'_'+self.channel
 
         if (self.channel == 'el'): lumi=elLumi
         elif (self.channel == 'mu'): lumi=muLumi
-        
+
+        #get histograms with proper normalization
         for sample in samples:
-            if DEBUG: print 'preparing sample:',sample.name
+            #skip electron (muon) data for muon (electron) channel
             if (self.channel=='el' and 'SingleMu' in sample.name) or (self.channel=='mu' and 'SingleEl' in sample.name): continue
             
             sample.file=TFile(inputDir+'/'+sample.name+'.root')
-            #if not sample.file.IsOpen(): continue
             sample.tree=sample.file.Get(treeName)
             hName=self.name+'_'+sample.name
             sample.h=TH1F(hName,";"+self.xTitle,self.nBins,self.xMin,self.xMax)
@@ -118,19 +102,18 @@ class WPrimePlot:
             else: weight='1' #for backwards compatibility
 
             if sample.isMC:
-                SF=1.
-                #weight='weight_PU_PileUpCalc'
+                SF=1. #not currently being used
                 weight+='*weight_PU_ABC_PileUpCalc'
                 if (self.channel == 'el'): weight+='*weight_ElectronEff_WprimeCalc'
                 elif (self.channel == 'mu'): weight+='*weight_MuonEff_WprimeCalc'
 
-            if DEBUG: print 'TTree::Draw'
             if sample.name=='WJets':
                 sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc==0)','goff')
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc>0)','goff')
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc>0)','goff')
                 bTagEff=sample.h.Integral(0,self.nBins+1)
-                
+
+                #get shape from untagged sample
                 sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc==0)','goff')
                 result['W+light']=sample.h.Integral(0,self.nBins+1)
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc>0)','goff')
@@ -138,27 +121,26 @@ class WPrimePlot:
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&& n_Bjets_WprimeCalc>0)','goff')
                 result['W+b']=sample.h.Integral(0,self.nBins+1)-result['W+light']-result['W+c']
                 bTagEff/=sample.h.Integral(0,self.nBins+1)
-                sample.h.Scale(bTagEff)
+
+                sample.h.Scale(bTagEff) #get proper normalization
                 result['W+b']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
                 result['W+c']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
                 result['W+b']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
                 
             else: 
                 nSelectedRaw=sample.tree.Draw(self.distribution+">>"+hName,weight+'*('+cuts+'&&'+bTagCut+')','goff')
-            if DEBUG: print 'done TTree::Draw'
 
             if sample.isMC and sample.h.Integral(0,self.nBins+1)!=0: sample.h.Scale(SF*lumi*sample.crossSection/sample.nEvents)
 
-            if DEBUG:
+            if DEBUG: #for event comparison
                 if 'TTbar_Powheg' in sample.name and self.channel=='el':
                     sample.tree.SetScanField(0)
-                    #print '\n',sample.name,'   ',self.channel
-                    #sample.tree.Scan('run_CommonCalc:lumi_CommonCalc:event_CommonCalc:corr_met_WprimeCalc:jet_0_pt_WprimeCalc:jet_1_pt_WprimeCalc:elec_1_pt_WprimeCalc:elec_1_eta_WprimeCalc:elec_1_RelIso_WprimeCalc:muon_1_pt_WprimeCalc:muon_1_eta_WprimeCalc:muon_1_RelIso_WprimeCalc','('+cuts+'&&'+bTagCut+')')
+                    print '\n',sample.name,'   ',self.channel
+                    sample.tree.Scan('run_CommonCalc:lumi_CommonCalc:event_CommonCalc:corr_met_WprimeCalc:jet_0_pt_WprimeCalc:jet_1_pt_WprimeCalc:elec_1_pt_WprimeCalc:elec_1_eta_WprimeCalc:elec_1_RelIso_WprimeCalc:muon_1_pt_WprimeCalc:muon_1_eta_WprimeCalc:muon_1_RelIso_WprimeCalc','('+cuts+'&&'+bTagCut+')')
                     
-            #print sample.name,sample.h.Integral(0,self.nBins+1)
-            result[sample.name]=sample.h.Integral(0,self.nBins+1)
+            result[sample.name]=sample.h.Integral(0,self.nBins+1) #for cutflow table
 
-        if DEBUG: print 'doing formatting'
+        #format histograms and draw plots
         output.cd()
         self.signals=[]
         self.backgroundStack=THStack()
@@ -189,16 +171,16 @@ class WPrimePlot:
         self.top.SetFillColor(ROOT.kRed-7)
         self.top.SetLineColor(ROOT.kRed-4)
 
+        #get QCD normalization
         if doFracFit:
+            #zero out any negetive bins if present
             for binNo in range(0,self.nBins+1):
                 if self.qcd.GetBinContent(binNo)<0:
                     self.qcd.SetBinContent(binNo,0)
                     self.qcd.SetBinError(binNo,0)
-            if not bkgdNorms[self.nB].has_key(self.channel):
-                if DEBUG: print 'doing QCDFracFit'
-                bkgdNorms[self.nB][self.channel]=self.getNorms()
-                if DEBUG: print 'done QCDFracFit'
-                if bkgdNorms[self.nB][self.channel]:
+            if not bkgdNorms[self.nB].has_key(self.channel): #if fit hasn't been performed yet for this channel/multiplicity
+                bkgdNorms[self.nB][self.channel]=self.getNorms() #do the fit
+                if bkgdNorms[self.nB][self.channel]: #if fit was succesful
                     value=Double()
                     error=Double()
                     self.fitter.GetResult(0,value,error)
@@ -206,21 +188,18 @@ class WPrimePlot:
                     QCDFracUnc[self.nB][self.channel]=error
                     fitChi2[self.nB][self.channel]=self.fitter.GetChisquare()
                     fitNDF[self.nB][self.channel]=self.fitter.GetNDF()
-                    print "!!!"+self.nB+" SF:",bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1)
-                    self.ewk.Scale(bkgdNorms[self.nB][self.channel]['ewk']/self.ewk.Integral(0,self.nBins+1))
-                    self.top.Scale(bkgdNorms[self.nB][self.channel]['top']/self.top.Integral(0,self.nBins+1))
-                    
-                    self.qcd.Scale(bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1))
+                    fakeRate[self.nB][self.channel]=bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1)
+                    self.ewk.Scale(bkgdNorms[self.nB][self.channel]['ewk']/self.ewk.Integral(0,self.nBins+1)) #this is only done to show results of fit
+                    self.top.Scale(bkgdNorms[self.nB][self.channel]['top']/self.top.Integral(0,self.nBins+1)) #this is only done to show results of fit
+            self.qcd.Scale(fakeRate[self.nB][self.channel])
 
-            #TEST
-            #self.qcd.Scale(0.479727563254) #0p el MET SF
-            #if self.nB=='2p': self.qcd.Scale(0.376765493963) #1p el MET SF
-            #else: self.qcd.Scale(bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1))
-
-            self.qcd.Scale(0.258043712712)  #0p el relIso SF (scheme C)
-            #if self.nB=='2p': self.qcd.Scale(0.290895753599)   #1p el relIso SF (scheme B)
-            #else: self.qcd.Scale(bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1))
-
+            #Scheme Choice
+            #Scheme B
+            #if self.nB=='2p': self.qcd.Scale(fakeRate['1p'][self.channel])
+            #else: self.qcd.Scale(fakeRate[self.nB][self.channel])
+            #Scheme C
+            self.qcd.Scale(fakeRate['0p'][self.channel])
+                        
         self.backgroundStack.Add(self.qcd)
         self.backgroundStack.Add(self.ewk)
         self.backgroundStack.Add(self.top)
@@ -230,29 +209,25 @@ class WPrimePlot:
         result['Data']=self.data.Integral(0,self.nBins+1)
         result['QCD']=self.qcd.Integral(0,self.nBins+1)
 
-        if DEBUG: print 'leaving Prepare'
         return result
 
 
     def Draw(self):
-        if DEBUG: print 'in Draw'
 
         self.canvas=TCanvas(self.name,"",1000,800)
 
         yDiv=0.35
-        self.uPad=TPad("uPad","",0,yDiv,1,1)
+        self.uPad=TPad("uPad","",0,yDiv,1,1) #for actual plots
         self.uPad.SetBottomMargin(0)
         self.uPad.SetRightMargin(.05)
         self.uPad.SetLeftMargin(.18)
         self.uPad.Draw()
                                     
-        self.lPad=TPad("lPad","",0,0,1,yDiv)
+        self.lPad=TPad("lPad","",0,0,1,yDiv) #for sigma runner
         self.lPad.SetTopMargin(0)
-        self.lPad.SetBottomMargin(.4) #.5
+        self.lPad.SetBottomMargin(.4)
         self.lPad.SetRightMargin(.05)
         self.lPad.SetLeftMargin(.18)
-        #self.lPad.SetTickx(1)
-        #self.lPad.SetTicky(1)
         self.lPad.SetGridy()
         self.lPad.Draw()
                 
@@ -271,22 +246,20 @@ class WPrimePlot:
         binWidth=round(self.data.GetBinWidth(1),5)
         if binWidth-round(binWidth)<.001*binWidth: binWidth=int(round(binWidth))
         yTitle="Events / "+str(binWidth)
-        if '[' in self.xTitle and ']' in self.xTitle:
+        if '[' in self.xTitle and ']' in self.xTitle: #get units from x axis title
             begin=self.xTitle.find('[')+1
             end=self.xTitle.find(']')
             yTitle+=' '+self.xTitle[begin:end]
         self.data.GetYaxis().SetTitle(yTitle)
 
         self.uPad.cd()
-        self.data.Draw("E1") #to get yTitle
+        self.data.Draw("E1") #draw data first because its easier to format a TH1 than a THStack
         self.backgroundStack.Draw("SAME HIST")
-        #self.signalStack.Draw("SAME NOSTACK") #this does not work
-        #self.signalStack.Draw("SAME") #this works
-        #self.signalStack.Draw("NOSTACK")
         for signal in self.signals: signal.Draw("SAME HIST")
-        self.data.Draw("SAME E1")
+        self.data.Draw("SAME E1") #redraw data so its not hidden
         self.uPad.RedrawAxis()
 
+        #calculate stat+sys uncertainty
         self.uncBand=self.background.Clone("unc")
         for binNo in range(0,self.nBins+1):
             lumiUnc=0
@@ -297,13 +270,12 @@ class WPrimePlot:
                     lumiUnc+=(sample.h.GetBinContent(binNo)*lumiFracUnc)**2
                     if sample.name=='WJets': sigmaFracUnc=wJetsSigmaFracUnc
                     elif sample.name[0]=='T': sigmaFracUnc=ttbarSigmaFracUnc
-                    else: sigmaFracUnc=otherSigmaFracUnc
+                    else: sigmaFracUnc=otherSigmaFracUnc #WW, Z+Jets
                     sigmaUnc+=(sample.h.GetBinContent(binNo)*sigmaFracUnc)**2
                     statUnc+=sample.h.GetBinError(binNo)**2
             totalUnc=sqrt(lumiUnc+sigmaUnc+statUnc)
             self.uncBand.SetBinError(binNo,totalUnc)
             self.background.SetBinError(binNo,totalUnc)
-            #would be nice to set error on backgroundStack as well
         self.uncBand.SetFillStyle(3344)
         self.uncBand.SetFillColor(1)
         self.uncBand.SetLineColor(1)
@@ -380,19 +352,19 @@ class WPrimePlot:
         self.pull.Draw("HIST")
 
         output.cd()
-        #self.canvas.Write()
+        self.canvas.Write()
         self.data.Write()
         self.qcd.Write()
         self.ewk.Write()
         self.top.Write()
         self.canvas.SaveAs(inputDir+'/'+self.name+'.pdf')
-        self.canvas.SaveAs(inputDir+'/'+self.name+'.eps')
-        self.canvas.SaveAs(inputDir+'/'+self.name+'.C')
+        #self.canvas.SaveAs(inputDir+'/'+self.name+'.eps')
+        #self.canvas.SaveAs(inputDir+'/'+self.name+'.C')
 
-        if DEBUG: print 'leaving Draw'
+    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
+    #does the QCD fit
     def getNorms(self):
-        if DEBUG: print 'in getNorms'
         data=self.data.Clone("data")
         backgrounds=TObjArray(3)
         backgrounds.Add(self.qcd.Clone(self.name+'_qcd_fitRes'))
@@ -400,21 +372,11 @@ class WPrimePlot:
         backgrounds.Add(self.top.Clone(self.name+'_top_fitRes'))
 
         self.fitter=TFractionFitter(data,backgrounds)
-        integral=0
         for binNo in range(self.nBins+2):
-            integral+=data.GetBinContent(binNo)
-            #if integral>.9*data.Integral(0,self.nBins): self.fitter.ExcludeBin(binNo)  #TESTING
             for hist in [data,backgrounds[0],backgrounds[1],backgrounds[2]]:
-                if hist.GetBinContent(binNo)<5: self.fitter.ExcludeBin(binNo)
+                if hist.GetBinContent(binNo)<5: self.fitter.ExcludeBin(binNo) #can't have bins with very small content included in fit
 
-        #TEST
-        #self.fitter.ExcludeBin(1)
-        
-                
-
-        if DEBUG: print 'Fit()'                
         status=self.fitter.Fit()
-        if DEBUG: print 'Fit done'
         
         result={}
         if status==0:
@@ -434,7 +396,6 @@ class WPrimePlot:
             self.fitter.GetResult(2,value,error)
             result['top']=value*data.Integral(0,self.nBins+1)
             
-        if DEBUG: print 'leaving getNorms'
         return result
     
                                 
@@ -446,6 +407,7 @@ if __name__=='__main__':
     plots=[]
     for n in bJetRequirements:
         yields[n]={}
+
         if doFracFit:
             plots+=[#WPrimePlot(name='corr_met_fitRes',distribution='corr_met_WprimeCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='el'),
                     WPrimePlot(name='electron0_RelIso_fitRes',distribution='elec_1_RelIso_WprimeCalc',nBins=90,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
@@ -490,7 +452,7 @@ if __name__=='__main__':
 
     cWidth=15; nameWidth=35
     for c in channels:
-        print ("CHANNEL = "+c).ljust(nameWidth+(2*cWidth+1)),"N_b"
+        print ("CHANNEL:"+c).ljust(nameWidth+(2*cWidth+1)),"N_b"
         print "".ljust(nameWidth),
         for n in bJetRequirements: print n.ljust(cWidth),
         print
@@ -517,13 +479,14 @@ if __name__=='__main__':
             print str(round(yields[n][c]['Total Background']/yields[n][c]['Data'],3)).ljust(cWidth),
         print 3*'\n'
         
-
-for c in channels:
-    print 'channel:',c
-    for n in bJetRequirements:
-        print 'nB:',n
-        print 'QCDFrac =',QCDFrac[n][c]
-        print 'QCDFracUnc =',QCDFracUnc[n][c]
-        print '100*QCDFracUnc/QCDFrac =',100*QCDFracUnc[n][c]/QCDFrac[n][c]
-        print 'chi2/nDF =',fitChi2[n][c]/fitNDF[n][c]
-    print
+if doFracFit:
+    for c in channels:
+        print 'CHANNEL:',c
+        for n in bJetRequirements:
+            print 'nB:',n
+            print 'QCDFrac =',QCDFrac[n][c]
+            print 'QCDFracUnc =',QCDFracUnc[n][c]
+            print "fake rate:",fakeRate[n][c]
+            print '100*QCDFracUnc/QCDFrac =',100*QCDFracUnc[n][c]/QCDFrac[n][c]
+            print 'chi2/nDF =',fitChi2[n][c]/fitNDF[n][c]
+        print
