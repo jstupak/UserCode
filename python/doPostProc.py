@@ -191,14 +191,15 @@ class WPrimePlot:
                     fakeRate[self.nB][self.channel]=bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1)
                     self.ewk.Scale(bkgdNorms[self.nB][self.channel]['ewk']/self.ewk.Integral(0,self.nBins+1)) #this is only done to show results of fit
                     self.top.Scale(bkgdNorms[self.nB][self.channel]['top']/self.top.Integral(0,self.nBins+1)) #this is only done to show results of fit
-            self.qcd.Scale(fakeRate[self.nB][self.channel])
 
             #Scheme Choice
+            #scheme A
+            #self.qcd.Scale(fakeRate[self.nB][self.channel])
             #Scheme B
-            #if self.nB=='2p': self.qcd.Scale(fakeRate['1p'][self.channel])
-            #else: self.qcd.Scale(fakeRate[self.nB][self.channel])
+            if self.nB=='2p': self.qcd.Scale(fakeRate['1p'][self.channel])
+            else: self.qcd.Scale(fakeRate[self.nB][self.channel])
             #Scheme C
-            self.qcd.Scale(fakeRate['0p'][self.channel])
+            #self.qcd.Scale(fakeRate['0p'][self.channel])
                         
         self.backgroundStack.Add(self.qcd)
         self.backgroundStack.Add(self.ewk)
