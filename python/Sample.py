@@ -1,4 +1,3 @@
-#from ROOT import *
 import os
 from copy import deepcopy
 
@@ -57,23 +56,24 @@ class Sample:
 ################################################################################################################################################
 
 dataMuA=Sample('SingleMu_13Jul2012A',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012A_13Jul2012_v1_TLBSM_53x_v2_jsonfix_cff.txt')
-#dataMuA_recover=Sample('SingleMu_SingleMu_06Aug2012A',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012A_recover_06Aug2012_v1_TLBSM_53x_v2_cff.txt') #Misnamed sample for backwards compatibility  
 dataMuA_recover=Sample('SingleMu_06Aug2012A',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012A_recover_06Aug2012_v1_TLBSM_53x_v2_cff.txt')
 dataMuB=Sample('SingleMu_13Jul2012B',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012B_13Jul2012_v1_TLBSM_53x_v2_cff.txt')
 dataMuC=Sample('SingleMu_24Aug2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_24Aug2012_v1_TLBSM_53x_v2_cff.txt')
 dataMuC_prompt=Sample('SingleMu_Prompt2012C1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_cff.txt')
 dataMuC_prompt_ext=Sample('SingleMu_Prompt2012C2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_extension_v1_cff.txt')
-
+dataMuD_prompt=Sample('SingleMu_Prompt2012D1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_cff.txt')
+dataMuD_prompt_ext=Sample('SingleMu_Prompt2012D2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_extension_v2_cff.txt')
 
 dataElA=Sample('SingleElectron_13Jul2012A',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012A_13Jul2012_v1_TLBSM_53x_v2_cff.txt')
-#dataElA_recover=Sample('SingleElectron_06Aug2012A_recover',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012A_recover_06Aug2012_v1_TLBSM_53x_v2_cff.txt') #Misnamed sample for backwards compatibility
 dataElA_recover=Sample('SingleElectron_06Aug2012A',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012A_recover_06Aug2012_v1_TLBSM_53x_v2_cff.txt')
 dataElB=Sample('SingleElectron_13Jul2012B',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012B_13Jul2012_v1_TLBSM_53x_v2_cff.txt')
 dataElC=Sample('SingleElectron_24Aug2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_24Aug2012_v1_TLBSM_53x_v2_cff.txt')
-dataElC_prompt=None
+dataElC_prompt=Sample('SingleElectron_Prompt2012C1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_cff.txt')
 dataElC_prompt_ext=Sample('SingleElectron_Prompt2012C2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_extension_v1_cff.txt')
+dataElD_prompt=Sample('SingleElectron_Prompt2012D1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_bugfix_cff.txt')
+dataElD_prompt_ext=Sample('SingleElectron_Prompt2012D2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_extension_v1_cff.txt')
 
-data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt_ext]
+data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataMuD_prompt,dataMuD_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt_ext,dataElD_prompt,dataElD_prompt_ext]
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -103,6 +103,16 @@ for sample in data+EWK:
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+chargedHiggs200=Sample('chargedHiggs200',sampleType='signal',altName='H^{#pm} (m=200 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-200_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs300=Sample('chargedHiggs300',sampleType='signal',altName='H^{#pm} (m=300 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-300_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+#chargedHiggs400=Sample('chargedHiggs400',sampleType='signal',altName='H^{#pm} (m=400 GeV)',crossSection=1,filesPerJob=10,nEvents=,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-400_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs500=Sample('chargedHiggs500',sampleType='signal',altName='H^{#pm} (m=500 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-500_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs600=Sample('chargedHiggs600',sampleType='signal',altName='H^{#pm} (m=600 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-600_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs700=Sample('chargedHiggs700',sampleType='signal',altName='H^{#pm} (m=700 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-700_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+
+signal=[chargedHiggs200,chargedHiggs300,chargedHiggs500,chargedHiggs600,chargedHiggs700]
+
+"""
 Wprime800Right =Sample("Wprime800Right" ,sampleType="signal",altName="W^{'}_{R} (m=800GeV)",crossSection=1.5352,filesPerJob=19,nEvents=920654,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
 #Wprime900Right =Sample("Wprime900Right" ,sampleType="signal",altName="W^{'}_{R} (m=900GeV)",crossSection=0.9214,filesPerJob=20,nEvents=,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
 #Wprime1000Right=Sample("Wprime1000Right",sampleType="signal",altName="W^{'}_{R} (m=1TeV)"  ,crossSection=0.5704,filesPerJob=20,nEvents=,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
@@ -128,11 +138,16 @@ Wprime2900Right=Sample("Wprime2900Right",sampleType="signal",altName="W^{'}_{R} 
 Wprime3000Right=Sample("Wprime3000Right",sampleType="signal",altName="W^{'}_{R} (m=3TeV)"  ,crossSection=0.00056,filesPerJob=20,nEvents=932601,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_3000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
 
 signal=[Wprime800Right,Wprime1100Right,Wprime1200Right,Wprime1300Right,Wprime1400Right,Wprime1500Right,Wprime1600Right,Wprime1700Right,Wprime1800Right,Wprime1900Right,Wprime2000Right,Wprime2100Right,Wprime2200Right,Wprime2300Right,Wprime2400Right,Wprime2500Right,Wprime2600Right,Wprime2700Right,Wprime2800Right,Wprime2900Right,Wprime3000Right]
+"""
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-samplesForPlotting=data+[Wprime1900Right,TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+QCD
+#allSamples=signal+QCD+EWK+data
+#samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+QCD+[TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
-allSamples=signal+QCD+[TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
+allSamples=signal+EWK+data
+samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+[TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
+
+#allSamples=[dataElC_prompt]
