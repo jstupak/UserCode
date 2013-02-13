@@ -2,37 +2,50 @@ from ROOT import *
 gROOT.SetBatch(1)
 from LJMet.Com.Sample import samplesForPlotting as samples
 from tdrStyle import *
+from sys import argv
+import os
+
 setTDRStyle()
 gStyle.SetOptStat(False)
 
 DEBUG=False
 
-inputDir='/uscms_data/d1/jstupak/analysisOutputs/'
-inputDir+='2012_12_16/newEventSelTest'
+if len(argv)>1:
+    inputDir=argv[1]
+else:
+    inputDir='/uscms_data/d1/jstupak/chargedHiggs/2013_2_8/test'
 
 bJetRequirements=['0p','0','1','1p','2p']
 
 channels=['el','mu']
 
-doCutTable=True
-doFracFit=True
+doCutTable=True   #produce selection yield table
+
+doFracFit=False   #For data driven QCD
+
+#These currently do nothing, just thinking ahead
+doJES=False
+doJER=False
+doBTS=False
     
-outputName=inputDir+'/plots.root'
+outputDir=inputDir+'/plots'
+
+sharedSelectionCuts='jet_0_pt_ChargedHiggsCalc >= 120 && jet_1_pt_ChargedHiggsCalc >= 40'
+elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 50 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20'
+muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 50 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20'
+
+finalCuts='BestTop_Pt_LjetsTopoCalcNew > 85 && Jet1Jet2_Pt_LjetsTopoCalcNew > 140 && 130 < BestTop_LjetsTopoCalcNew && BestTop_LjetsTopoCalcNew < 210'
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-elLumi=6732.0
-muLumi=12211.0
+elLumi=19624
+muLumi=19624
 
 treeName='ljmet'
 
-sharedSelectionCuts='jet_0_pt_WprimeCalc >= 100 && jet_1_pt_WprimeCalc >= 40'
-elSelectionCuts='elec_1_pt_WprimeCalc > 30 && abs(elec_1_eta_WprimeCalc) < 2.5 && elec_1_RelIso_WprimeCalc < 0.1  && corr_met_WprimeCalc > 20'
-muSelectionCuts='muon_1_pt_WprimeCalc > 26 && abs(muon_1_eta_WprimeCalc) < 2.1 && muon_1_RelIso_WprimeCalc < 0.12 && corr_met_WprimeCalc > 20'
-
-SFWj = 0.85
-SFWc = 0.92*1.66
-SFWb = 0.92*1.21
+SFWj = 0.82
+SFWc = 0.93*1.66
+SFWb = 0.93*1.21
 
 lumiFracUnc = 0.022
 ttbarSigmaFracUnc = 0.15
@@ -41,7 +54,8 @@ otherSigmaFracUnc = 0.20
                 
 #---------------------------------------------------------------------------------------------------------------------------------------------
 
-output=TFile(outputName,"RECREATE")
+if not os.path.isdir(outputDir): os.system("mkdir -p "+outputDir)
+output=TFile(outputDir+'/plots.root',"RECREATE")
 bkgdNorms={}
 QCDFrac={}
 QCDFracUnc={}
@@ -49,7 +63,7 @@ fakeRate={}
 fitChi2={}
 fitNDF={}
 
-class WPrimePlot:
+class ChargedHiggsPlot:
     
     def __init__(self,name,distribution,nBins=100,xMin=0,xMax=100,xTitle='',yLog=True,nB="0",otherCuts='',channel='el'):
         self.name=name; self.distribution=distribution; self.nBins=nBins; self.xMin=xMin; self.xMax=xMax; self.xTitle=xTitle; self.yLog=yLog; self.nB=nB; self.otherCuts=otherCuts; self.channel=channel;
@@ -69,18 +83,18 @@ class WPrimePlot:
         elif self.channel=='mu': cuts+='&&'+muSelectionCuts
 
         if self.nB=="0":
-            bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)==0)'
+            bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==0)'
         elif self.nB=="0p":
             bTagCut='1'
         elif self.nB=="1":
-            bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)==1)'
+            bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==1)'
         elif self.nB=="1p":
-            bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)>=1)'
+            bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)>=1)'
         elif self.nB=="2":
-            bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)==2)'
+            bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==2)'
         elif self.nB=="2p":
-            #bTagCut='((jet_0_tag_WprimeCalc + jet_1_tag_WprimeCalc)>=2)'
-            bTagCut='((jet_0_tag_WprimeCalc==1 && (jet_1_tag_WprimeCalc + jet_2_tag_WprimeCalc + jet_3_tag_WprimeCalc + jet_4_tag_WprimeCalc + jet_5_tag_WprimeCalc + jet_6_tag_WprimeCalc + jet_7_tag_WprimeCalc + jet_8_tag_WprimeCalc + jet_9_tag_WprimeCalc) >= 1 ) || (jet_1_tag_WprimeCalc==1 && (jet_0_tag_WprimeCalc + jet_2_tag_WprimeCalc + jet_3_tag_WprimeCalc + jet_4_tag_WprimeCalc + jet_5_tag_WprimeCalc + jet_6_tag_WprimeCalc + jet_7_tag_WprimeCalc + jet_8_tag_WprimeCalc + jet_9_tag_WprimeCalc) >= 1))'
+            #bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)>=2)'
+            bTagCut='((jet_0_tag_ChargedHiggsCalc==1 && (jet_1_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc + jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 1 ) || (jet_1_tag_ChargedHiggsCalc==1 && (jet_0_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc + jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 1))'
 
         #make name unique
         self.name+='_nB'+self.nB+'_'+self.channel
@@ -98,27 +112,27 @@ class WPrimePlot:
             hName=self.name+'_'+sample.name
             sample.h=TH1F(hName,";"+self.xTitle,self.nBins,self.xMin,self.xMax)
 
-            if sample.tree.GetLeaf('sampleWeight_WprimeCalc'): weight='sampleWeight_WprimeCalc'
+            if sample.tree.GetLeaf('sampleWeight_ChargedHiggsCalc'): weight='sampleWeight_ChargedHiggsCalc'
             else: weight='1' #for backwards compatibility
 
             if sample.isMC:
                 SF=1. #not currently being used
-                weight+='*weight_PU_ABC_PileUpCalc'
-                if (self.channel == 'el'): weight+='*weight_ElectronEff_WprimeCalc'
-                elif (self.channel == 'mu'): weight+='*weight_MuonEff_WprimeCalc'
+                weight+='*weight_PU_ABCD_PileUpCalc'
+                if (self.channel == 'el'): weight+='*weight_ElectronEff_ChargedHiggsCalc'
+                elif (self.channel == 'mu'): weight+='*weight_MuonEff_ChargedHiggsCalc'
 
             if sample.name=='WJets':
-                sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc==0)','goff')
-                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc>0)','goff')
-                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_WprimeCalc>0)','goff')
+                sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc==0)','goff')
+                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc>0)','goff')
+                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc>0)','goff')
                 bTagEff=sample.h.Integral(0,self.nBins+1)
 
                 #get shape from untagged sample
-                sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc==0)','goff')
+                sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc==0)','goff')
                 result['W+light']=sample.h.Integral(0,self.nBins+1)
-                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&& n_Bjets_WprimeCalc==0 && n_Cjets_WprimeCalc>0)','goff')
+                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc>0)','goff')
                 result['W+c']=sample.h.Integral(0,self.nBins+1)-result['W+light']
-                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&& n_Bjets_WprimeCalc>0)','goff')
+                sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc>0)','goff')
                 result['W+b']=sample.h.Integral(0,self.nBins+1)-result['W+light']-result['W+c']
                 bTagEff/=sample.h.Integral(0,self.nBins+1)
 
@@ -136,7 +150,7 @@ class WPrimePlot:
                 if 'TTbar_Powheg' in sample.name and self.channel=='el':
                     sample.tree.SetScanField(0)
                     print '\n',sample.name,'   ',self.channel
-                    sample.tree.Scan('run_CommonCalc:lumi_CommonCalc:event_CommonCalc:corr_met_WprimeCalc:jet_0_pt_WprimeCalc:jet_1_pt_WprimeCalc:elec_1_pt_WprimeCalc:elec_1_eta_WprimeCalc:elec_1_RelIso_WprimeCalc:muon_1_pt_WprimeCalc:muon_1_eta_WprimeCalc:muon_1_RelIso_WprimeCalc','('+cuts+'&&'+bTagCut+')')
+                    sample.tree.Scan('run_CommonCalc:lumi_CommonCalc:event_CommonCalc:corr_met_ChargedHiggsCalc:jet_0_pt_ChargedHiggsCalc:jet_1_pt_ChargedHiggsCalc:elec_1_pt_ChargedHiggsCalc:elec_1_eta_ChargedHiggsCalc:elec_1_RelIso_ChargedHiggsCalc:muon_1_pt_ChargedHiggsCalc:muon_1_eta_ChargedHiggsCalc:muon_1_RelIso_ChargedHiggsCalc','('+cuts+'&&'+bTagCut+')')
                     
             result[sample.name]=sample.h.Integral(0,self.nBins+1) #for cutflow table
 
@@ -358,9 +372,9 @@ class WPrimePlot:
         self.qcd.Write()
         self.ewk.Write()
         self.top.Write()
-        self.canvas.SaveAs(inputDir+'/'+self.name+'.pdf')
-        #self.canvas.SaveAs(inputDir+'/'+self.name+'.eps')
-        #self.canvas.SaveAs(inputDir+'/'+self.name+'.C')
+        self.canvas.SaveAs(outputDir+'/'+self.name+'.pdf')
+        #self.canvas.SaveAs(outputDir+'/'+self.name+'.eps')
+        #self.canvas.SaveAs(outputDir+'/'+self.name+'.C')
 
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -410,41 +424,41 @@ if __name__=='__main__':
         yields[n]={}
 
         if doFracFit:
-            plots+=[#WPrimePlot(name='corr_met_fitRes',distribution='corr_met_WprimeCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='el'),
-                    WPrimePlot(name='electron0_RelIso_fitRes',distribution='elec_1_RelIso_WprimeCalc',nBins=90,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
-                    #WPrimePlot(name='corr_met_fitRes',distribution='corr_met_WprimeCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='mu'),
-                    #WPrimePlot(name='muon0_RelIso_fitRes',distribution='muon_1_RelIso_WprimeCalc',nBins=250,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
+            plots+=[#ChargedHiggsPlot(name='corr_met_fitRes',distribution='corr_met_ChargedHiggsCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='el'),
+                    ChargedHiggsPlot(name='electron0_RelIso_fitRes',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=90,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
+                    #ChargedHiggsPlot(name='corr_met_fitRes',distribution='corr_met_ChargedHiggsCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_RelIso_fitRes',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=250,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
                     ]
             
         if doCutTable:
-            plots+=[WPrimePlot(name='electron0_pt',distribution='elec_1_pt_WprimeCalc',nBins=100,xMin=0,xMax=7000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
-                    WPrimePlot(name='muon0_pt',distribution='muon_1_pt_WprimeCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu')
+            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
+                    ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu')
                     ]
 
         else:
-            plots+=[WPrimePlot(name='electron0_pt',distribution='elec_1_pt_WprimeCalc',nBins=100,xMin=0,xMax=1000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
-                    WPrimePlot(name='electron0_eta',distribution='elec_1_eta_WprimeCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,nB=n,channel='el'),
-                    WPrimePlot(name='electron0_RelIso',distribution='elec_1_RelIso_WprimeCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
+            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
+                    ChargedHiggsPlot(name='electron0_eta',distribution='elec_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,nB=n,channel='el'),
+                    ChargedHiggsPlot(name='electron0_RelIso',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
                     
-                    #WPrimePlot(name='muon0_pt',distribution='muon_1_pt_WprimeCalc',nBins=100,xMin=0,xMax=1000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu'),
-                    #WPrimePlot(name='muon0_eta',distribution='muon_1_eta_WprimeCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,nB=n,channel='mu'),
-                    #WPrimePlot(name='muon0_RelIso',distribution='muon_1_RelIso_WprimeCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
+                    #ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_eta',distribution='muon_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,nB=n,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_RelIso',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
                     ]
             for c in channels:
-                plots+=[WPrimePlot(name='BestJetJet2W_M',distribution='BestJetJet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='Jet1Jet2W_M',distribution='Jet1Jet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
-                        WPrimePlot(name='corr_met',distribution='corr_met_WprimeCalc',nBins=100,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet0_pt',distribution='jet_0_pt_WprimeCalc',nBins=130,xMin=0,xMax=1300,xTitle='p_{T} (jet1) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet0_eta',distribution='jet_0_eta_WprimeCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet1_pt',distribution='jet_1_pt_WprimeCalc',nBins=120,xMin=0,xMax=1200,xTitle='p_{T} (jet2) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet1_eta',distribution='jet_1_eta_WprimeCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet2_pt',distribution='jet_2_pt_WprimeCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='PFjet2_eta',distribution='jet_2_eta_WprimeCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,nB=n,channel=c),
-                        WPrimePlot(name='TopMass_Best',distribution='BestTop_LjetsTopoCalcNew',nBins=100,xMin=0,xMax=1000,xTitle='M(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,nB=n,channel=c),
-                        #WPrimePlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,nB=n,channel=c),
-                        WPrimePlot(name='nPV',distribution='nPV_WprimeCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,nB=n,channel=c)
+                plots+=[ChargedHiggsPlot(name='BestJetJet2W_M',distribution='BestJetJet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='Jet1Jet2W_M',distribution='Jet1Jet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
+                        ChargedHiggsPlot(name='corr_met',distribution='corr_met_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet0_pt',distribution='jet_0_pt_ChargedHiggsCalc',nBins=130,xMin=0,xMax=1300,xTitle='p_{T} (jet1) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet0_eta',distribution='jet_0_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet1_pt',distribution='jet_1_pt_ChargedHiggsCalc',nBins=120,xMin=0,xMax=1200,xTitle='p_{T} (jet2) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet1_eta',distribution='jet_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet2_pt',distribution='jet_2_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='PFjet2_eta',distribution='jet_2_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,nB=n,channel=c),
+                        ChargedHiggsPlot(name='TopMass_Best',distribution='BestTop_LjetsTopoCalcNew',nBins=100,xMin=0,xMax=1000,xTitle='M(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,nB=n,channel=c),
+                        #ChargedHiggsPlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,nB=n,channel=c),
+                        ChargedHiggsPlot(name='nPV',distribution='nPV_ChargedHiggsCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,nB=n,channel=c)
                         ]
                 
     for plot in plots:
