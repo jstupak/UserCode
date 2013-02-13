@@ -13,7 +13,7 @@ class Sample:
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def setType(self):
-        if type(self.type)!=type(""): return
+        if type(self.type)!=type(''): return
 
         self.type=self.type.lower()
 
@@ -27,7 +27,7 @@ class Sample:
             self.isMC=True
             self.isBackground=True
         else:
-            raise Exception("Invalid Sample type")
+            raise Exception('Invalid Sample type')
 
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -36,7 +36,7 @@ class Sample:
         
         self.inputList=[]
         for line in open(os.environ['CMSSW_BASE']+'/'+self.inputListFile):
-            if ".root" in line: self.inputList+=[line.strip().strip(",")[1:-1]]
+            if '.root' in line: self.inputList+=[line.strip().strip(',')[1:-1]]
 
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -73,7 +73,7 @@ dataElC_prompt_ext=Sample('SingleElectron_Prompt2012C2',sampleType='data',filesP
 dataElD_prompt=Sample('SingleElectron_Prompt2012D1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_bugfix_cff.txt')
 dataElD_prompt_ext=Sample('SingleElectron_Prompt2012D2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_extension_v1_cff.txt')
 
-data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataMuD_prompt,dataMuD_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt_ext,dataElD_prompt,dataElD_prompt_ext]
+data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataMuD_prompt,dataMuD_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt,dataElC_prompt_ext,dataElD_prompt,dataElD_prompt_ext]
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -97,7 +97,7 @@ EWK=[WJets,WW,TTbar_Madgraph,TTbar_Powheg,ZJets,ZZ,T_tW,Tbar_tW,T_t,Tbar_t,T_s,T
 QCD=[]
 for sample in data+EWK:
     if 'ZZ' in sample.name or 'TTbar_Madgraph' in sample.name: continue
-    QCDSample=sample.clone("QCD_"+sample.name)
+    QCDSample=sample.clone('QCD_'+sample.name)
     QCDSample.doQCD=True
     QCD.append(QCDSample)
 
@@ -113,29 +113,29 @@ chargedHiggs700=Sample('chargedHiggs700',sampleType='signal',altName='H^{#pm} (m
 signal=[chargedHiggs200,chargedHiggs300,chargedHiggs500,chargedHiggs600,chargedHiggs700]
 
 """
-Wprime800Right =Sample("Wprime800Right" ,sampleType="signal",altName="W^{'}_{R} (m=800GeV)",crossSection=1.5352,filesPerJob=19,nEvents=920654,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-#Wprime900Right =Sample("Wprime900Right" ,sampleType="signal",altName="W^{'}_{R} (m=900GeV)",crossSection=0.9214,filesPerJob=20,nEvents=,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-#Wprime1000Right=Sample("Wprime1000Right",sampleType="signal",altName="W^{'}_{R} (m=1TeV)"  ,crossSection=0.5704,filesPerJob=20,nEvents=,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1100Right=Sample("Wprime1100Right",sampleType="signal",altName="W^{'}_{R} (m=1.1TeV)",crossSection=0.3623,filesPerJob=20,nEvents=831508,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1100_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1200Right=Sample("Wprime1200Right",sampleType="signal",altName="W^{'}_{R} (m=1.2TeV)",crossSection=0.2348,filesPerJob=20,nEvents=965528,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1200_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1300Right=Sample("Wprime1300Right",sampleType="signal",altName="W^{'}_{R} (m=1.3TeV)",crossSection=0.1548,filesPerJob=20,nEvents=881046,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1300_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1400Right=Sample("Wprime1400Right",sampleType="signal",altName="W^{'}_{R} (m=1.4TeV)",crossSection=0.1036,filesPerJob=20,nEvents=920262,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1400_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1500Right=Sample("Wprime1500Right",sampleType="signal",altName="W^{'}_{R} (m=1.5TeV)",crossSection=0.0701,filesPerJob=20,nEvents=907297,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1500_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1600Right=Sample("Wprime1600Right",sampleType="signal",altName="W^{'}_{R} (m=1.6TeV)",crossSection=0.048,filesPerJob=20,nEvents=892146,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1600_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1700Right=Sample("Wprime1700Right",sampleType="signal",altName="W^{'}_{R} (m=1.7TeV)",crossSection=0.0331,filesPerJob=20,nEvents=924438,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1700_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1800Right=Sample("Wprime1800Right",sampleType="signal",altName="W^{'}_{R} (m=1.8TeV)",crossSection=0.0231,filesPerJob=20,nEvents=841448,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime1900Right=Sample("Wprime1900Right",sampleType="signal",altName="W^{'}_{R} (m=1.9TeV)",crossSection=0.0162,filesPerJob=20,nEvents=835381.0,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2000Right=Sample("Wprime2000Right",sampleType="signal",altName="W^{'}_{R} (m=2TeV)"  ,crossSection=0.0114,filesPerJob=20,nEvents=841836,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2100Right=Sample("Wprime2100Right",sampleType="signal",altName="W^{'}_{R} (m=2.1TeV)",crossSection=0.008,filesPerJob=20,nEvents=926108,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2100_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2200Right=Sample("Wprime2200Right",sampleType="signal",altName="W^{'}_{R} (m=2.2TeV)",crossSection=0.006,filesPerJob=20,nEvents=932785,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2200_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2300Right=Sample("Wprime2300Right",sampleType="signal",altName="W^{'}_{R} (m=2.3TeV)",crossSection=0.004,filesPerJob=20,nEvents=784768,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2300_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2400Right=Sample("Wprime2400Right",sampleType="signal",altName="W^{'}_{R} (m=2.4TeV)",crossSection=0.003,filesPerJob=20,nEvents=894786,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2400_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2500Right=Sample("Wprime2500Right",sampleType="signal",altName="W^{'}_{R} (m=2.5TeV)",crossSection=0.002,filesPerJob=20,nEvents=878643,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2500_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2600Right=Sample("Wprime2600Right",sampleType="signal",altName="W^{'}_{R} (m=2.6TeV)",crossSection=0.0017,filesPerJob=20,nEvents=944599,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2600_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2700Right=Sample("Wprime2700Right",sampleType="signal",altName="W^{'}_{R} (m=2.7TeV)",crossSection=0.0012,filesPerJob=20,nEvents=915158,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2700_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2800Right=Sample("Wprime2800Right",sampleType="signal",altName="W^{'}_{R} (m=2.8TeV)",crossSection=0.00094,filesPerJob=20,nEvents=835281,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime2900Right=Sample("Wprime2900Right",sampleType="signal",altName="W^{'}_{R} (m=2.9TeV)",crossSection=0.00072,filesPerJob=20,nEvents=910111,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
-Wprime3000Right=Sample("Wprime3000Right",sampleType="signal",altName="W^{'}_{R} (m=3TeV)"  ,crossSection=0.00056,filesPerJob=20,nEvents=932601,inputListFile="src/LJMet/Com/python/Samples_2012/SingletopWprime_M_3000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt")
+Wprime800Right =Sample('Wprime800Right' ,sampleType='signal',altName='W^{'}_{R} (m=800GeV)',crossSection=1.5352,filesPerJob=19,nEvents=920654,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+#Wprime900Right =Sample('Wprime900Right' ,sampleType='signal',altName='W^{'}_{R} (m=900GeV)',crossSection=0.9214,filesPerJob=20,nEvents=,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+#Wprime1000Right=Sample('Wprime1000Right',sampleType='signal',altName='W^{'}_{R} (m=1TeV)'  ,crossSection=0.5704,filesPerJob=20,nEvents=,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1100Right=Sample('Wprime1100Right',sampleType='signal',altName='W^{'}_{R} (m=1.1TeV)',crossSection=0.3623,filesPerJob=20,nEvents=831508,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1100_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1200Right=Sample('Wprime1200Right',sampleType='signal',altName='W^{'}_{R} (m=1.2TeV)',crossSection=0.2348,filesPerJob=20,nEvents=965528,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1200_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1300Right=Sample('Wprime1300Right',sampleType='signal',altName='W^{'}_{R} (m=1.3TeV)',crossSection=0.1548,filesPerJob=20,nEvents=881046,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1300_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1400Right=Sample('Wprime1400Right',sampleType='signal',altName='W^{'}_{R} (m=1.4TeV)',crossSection=0.1036,filesPerJob=20,nEvents=920262,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1400_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1500Right=Sample('Wprime1500Right',sampleType='signal',altName='W^{'}_{R} (m=1.5TeV)',crossSection=0.0701,filesPerJob=20,nEvents=907297,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1500_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1600Right=Sample('Wprime1600Right',sampleType='signal',altName='W^{'}_{R} (m=1.6TeV)',crossSection=0.048,filesPerJob=20,nEvents=892146,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1600_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1700Right=Sample('Wprime1700Right',sampleType='signal',altName='W^{'}_{R} (m=1.7TeV)',crossSection=0.0331,filesPerJob=20,nEvents=924438,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1700_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1800Right=Sample('Wprime1800Right',sampleType='signal',altName='W^{'}_{R} (m=1.8TeV)',crossSection=0.0231,filesPerJob=20,nEvents=841448,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime1900Right=Sample('Wprime1900Right',sampleType='signal',altName='W^{'}_{R} (m=1.9TeV)',crossSection=0.0162,filesPerJob=20,nEvents=835381.0,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_1900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2000Right=Sample('Wprime2000Right',sampleType='signal',altName='W^{'}_{R} (m=2TeV)'  ,crossSection=0.0114,filesPerJob=20,nEvents=841836,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2100Right=Sample('Wprime2100Right',sampleType='signal',altName='W^{'}_{R} (m=2.1TeV)',crossSection=0.008,filesPerJob=20,nEvents=926108,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2100_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2200Right=Sample('Wprime2200Right',sampleType='signal',altName='W^{'}_{R} (m=2.2TeV)',crossSection=0.006,filesPerJob=20,nEvents=932785,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2200_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2300Right=Sample('Wprime2300Right',sampleType='signal',altName='W^{'}_{R} (m=2.3TeV)',crossSection=0.004,filesPerJob=20,nEvents=784768,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2300_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2400Right=Sample('Wprime2400Right',sampleType='signal',altName='W^{'}_{R} (m=2.4TeV)',crossSection=0.003,filesPerJob=20,nEvents=894786,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2400_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2500Right=Sample('Wprime2500Right',sampleType='signal',altName='W^{'}_{R} (m=2.5TeV)',crossSection=0.002,filesPerJob=20,nEvents=878643,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2500_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2600Right=Sample('Wprime2600Right',sampleType='signal',altName='W^{'}_{R} (m=2.6TeV)',crossSection=0.0017,filesPerJob=20,nEvents=944599,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2600_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2700Right=Sample('Wprime2700Right',sampleType='signal',altName='W^{'}_{R} (m=2.7TeV)',crossSection=0.0012,filesPerJob=20,nEvents=915158,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2700_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2800Right=Sample('Wprime2800Right',sampleType='signal',altName='W^{'}_{R} (m=2.8TeV)',crossSection=0.00094,filesPerJob=20,nEvents=835281,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime2900Right=Sample('Wprime2900Right',sampleType='signal',altName='W^{'}_{R} (m=2.9TeV)',crossSection=0.00072,filesPerJob=20,nEvents=910111,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_2900_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
+Wprime3000Right=Sample('Wprime3000Right',sampleType='signal',altName='W^{'}_{R} (m=3TeV)'  ,crossSection=0.00056,filesPerJob=20,nEvents=932601,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_3000_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
 
 signal=[Wprime800Right,Wprime1100Right,Wprime1200Right,Wprime1300Right,Wprime1400Right,Wprime1500Right,Wprime1600Right,Wprime1700Right,Wprime1800Right,Wprime1900Right,Wprime2000Right,Wprime2100Right,Wprime2200Right,Wprime2300Right,Wprime2400Right,Wprime2500Right,Wprime2600Right,Wprime2700Right,Wprime2800Right,Wprime2900Right,Wprime3000Right]
 """
@@ -150,4 +150,6 @@ samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+[TTbar_Powh
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 
-#allSamples=[dataElC_prompt]
+#problemSamples=[dataMuC_prompt,dataMuC_prompt_ext,dataElC_prompt_ext]
+#allSamples=problemSamples
+allSamples=[dataElC_prompt]
