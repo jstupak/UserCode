@@ -21,8 +21,6 @@ channels=['el','mu']
 
 doCutTable=True   #produce selection yield table
 
-doFracFit=False   #For data driven QCD
-
 #These currently do nothing, just thinking ahead
 doJES=False
 doJER=False
@@ -31,8 +29,8 @@ doBTS=False
 outputDir=inputDir+'/plots'
 
 sharedSelectionCuts='jet_0_pt_ChargedHiggsCalc >= 120 && jet_1_pt_ChargedHiggsCalc >= 40'
-elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 50 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20'
-muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 50 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20'
+elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 50 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
+muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 50 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
 
 finalCuts='BestTop_Pt_LjetsTopoCalcNew > 85 && Jet1Jet2_Pt_LjetsTopoCalcNew > 140 && 130 < BestTop_LjetsTopoCalcNew && BestTop_LjetsTopoCalcNew < 210'
 
@@ -56,24 +54,11 @@ otherSigmaFracUnc = 0.20
 
 if not os.path.isdir(outputDir): os.system("mkdir -p "+outputDir)
 output=TFile(outputDir+'/plots.root',"RECREATE")
-bkgdNorms={}
-QCDFrac={}
-QCDFracUnc={}
-fakeRate={}
-fitChi2={}
-fitNDF={}
 
 class ChargedHiggsPlot:
     
     def __init__(self,name,distribution,nBins=100,xMin=0,xMax=100,xTitle='',yLog=True,nB="0",otherCuts='',channel='el'):
         self.name=name; self.distribution=distribution; self.nBins=nBins; self.xMin=xMin; self.xMax=xMax; self.xTitle=xTitle; self.yLog=yLog; self.nB=nB; self.otherCuts=otherCuts; self.channel=channel;
-        if not bkgdNorms.has_key(self.nB): bkgdNorms[self.nB]={}
-        if not QCDFrac.has_key(self.nB):
-            QCDFrac[self.nB]={}
-            QCDFracUnc[self.nB]={}
-            fakeRate[self.nB]={}
-            fitChi2[self.nB]={}
-            fitNDF[self.nB]={}
                       
     def Prepare(self):
         result={}
@@ -112,14 +97,13 @@ class ChargedHiggsPlot:
             hName=self.name+'_'+sample.name
             sample.h=TH1F(hName,";"+self.xTitle,self.nBins,self.xMin,self.xMax)
 
-            if sample.tree.GetLeaf('sampleWeight_ChargedHiggsCalc'): weight='sampleWeight_ChargedHiggsCalc'
-            else: weight='1' #for backwards compatibility
-
+            weight='1'
             if sample.isMC:
-                SF=1. #not currently being used
-                weight+='*weight_PU_ABCD_PileUpCalc'
-                if (self.channel == 'el'): weight+='*weight_ElectronEff_ChargedHiggsCalc'
-                elif (self.channel == 'mu'): weight+='*weight_MuonEff_ChargedHiggsCalc'
+                weight+='* weight_PU_ABCD_PileUpCalc'
+                if (self.channel == 'el'):
+                    weight+='* weight_ElectronEff_53x_ChargedHiggsCalc'
+                    weight+='* (0.973*(abs(elec_1_eta_ChargedHiggsCalc)<1.5) + 1.02*(abs(elec_1_eta_ChargedHiggsCalc)>1.5&&abs(elec_1_eta_ChargedHiggsCalc)<2.5))'
+                elif (self.channel == 'mu'): weight+='* weight_MuonEff_ChargedHiggsCalc'
 
             if sample.name=='WJets':
                 sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc==0)','goff')
@@ -137,14 +121,14 @@ class ChargedHiggsPlot:
                 bTagEff/=sample.h.Integral(0,self.nBins+1)
 
                 sample.h.Scale(bTagEff) #get proper normalization
-                result['W+b']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
-                result['W+c']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
-                result['W+b']*=bTagEff*SF*lumi*sample.crossSection/sample.nEvents
+                result['W+b']*=bTagEff*lumi*sample.crossSection/sample.nEvents
+                result['W+c']*=bTagEff*lumi*sample.crossSection/sample.nEvents
+                result['W+b']*=bTagEff*lumi*sample.crossSection/sample.nEvents
                 
             else: 
                 nSelectedRaw=sample.tree.Draw(self.distribution+">>"+hName,weight+'*('+cuts+'&&'+bTagCut+')','goff')
 
-            if sample.isMC and sample.h.Integral(0,self.nBins+1)!=0: sample.h.Scale(SF*lumi*sample.crossSection/sample.nEvents)
+            if sample.isMC and sample.h.Integral(0,self.nBins+1)!=0: sample.h.Scale(lumi*sample.crossSection/sample.nEvents)
 
             if DEBUG: #for event comparison
                 if 'TTbar_Powheg' in sample.name and self.channel=='el':
@@ -160,13 +144,10 @@ class ChargedHiggsPlot:
         self.backgroundStack=THStack()
         self.ewk=TH1F(self.name+'_ewk',';'+self.xTitle,self.nBins,self.xMin,self.xMax)
         self.top=TH1F(self.name+'_top',';'+self.xTitle,self.nBins,self.xMin,self.xMax)
-        self.qcd=TH1F(self.name+'_qcd',';'+self.xTitle,self.nBins,self.xMin,self.xMax)
         self.data=TH1F(self.name+'_data',';'+self.xTitle,self.nBins,self.xMin,self.xMax)
         self.data.SetMarkerStyle(20)
         for sample in samples:
             if (self.channel=='el' and 'SingleMu' in sample.name) or (self.channel=='mu' and 'SingleEl' in sample.name): continue
-            elif sample.doQCD:
-                self.qcd.Add(sample.h)
             elif sample.isSignal:
                 sample.h.Scale(20)
                 sample.h.SetLineColor(1)
@@ -178,51 +159,17 @@ class ChargedHiggsPlot:
             elif sample.isData: self.data.Add(sample.h)
             sample.h.SetLineWidth(2)
                         
-        self.qcd.SetFillColor(ROOT.kBlue)
-        self.qcd.SetLineColor(ROOT.kBlue+2)
         self.ewk.SetFillColor(ROOT.kGreen-3)
         self.ewk.SetLineColor(ROOT.kGreen-2)
         self.top.SetFillColor(ROOT.kRed-7)
         self.top.SetLineColor(ROOT.kRed-4)
 
-        #get QCD normalization
-        if doFracFit:
-            #zero out any negetive bins if present
-            for binNo in range(0,self.nBins+1):
-                if self.qcd.GetBinContent(binNo)<0:
-                    self.qcd.SetBinContent(binNo,0)
-                    self.qcd.SetBinError(binNo,0)
-            if not bkgdNorms[self.nB].has_key(self.channel): #if fit hasn't been performed yet for this channel/multiplicity
-                bkgdNorms[self.nB][self.channel]=self.getNorms() #do the fit
-                if bkgdNorms[self.nB][self.channel]: #if fit was succesful
-                    value=Double()
-                    error=Double()
-                    self.fitter.GetResult(0,value,error)
-                    QCDFrac[self.nB][self.channel]=value
-                    QCDFracUnc[self.nB][self.channel]=error
-                    fitChi2[self.nB][self.channel]=self.fitter.GetChisquare()
-                    fitNDF[self.nB][self.channel]=self.fitter.GetNDF()
-                    fakeRate[self.nB][self.channel]=bkgdNorms[self.nB][self.channel]['qcd']/self.qcd.Integral(0,self.nBins+1)
-                    self.ewk.Scale(bkgdNorms[self.nB][self.channel]['ewk']/self.ewk.Integral(0,self.nBins+1)) #this is only done to show results of fit
-                    self.top.Scale(bkgdNorms[self.nB][self.channel]['top']/self.top.Integral(0,self.nBins+1)) #this is only done to show results of fit
-
-            #Scheme Choice
-            #scheme A
-            #self.qcd.Scale(fakeRate[self.nB][self.channel])
-            #Scheme B
-            if self.nB=='2p': self.qcd.Scale(fakeRate['1p'][self.channel])
-            else: self.qcd.Scale(fakeRate[self.nB][self.channel])
-            #Scheme C
-            #self.qcd.Scale(fakeRate['0p'][self.channel])
-                        
-        self.backgroundStack.Add(self.qcd)
         self.backgroundStack.Add(self.ewk)
         self.backgroundStack.Add(self.top)
 
         self.background=self.backgroundStack.GetStack().Last().Clone(self.name+'_background')
         result['Total Background']=self.background.Integral(0,self.nBins+1)
         result['Data']=self.data.Integral(0,self.nBins+1)
-        result['QCD']=self.qcd.Integral(0,self.nBins+1)
 
         return result
 
@@ -304,7 +251,6 @@ class ChargedHiggsPlot:
         legend.AddEntry(self.data,"Data")
         legend.AddEntry(self.top,"t#bar{t} + Single-Top", "f")
         legend.AddEntry(self.ewk,"W#rightarrowl#nu + Z/#gamma*#rightarrowl^{+}l^{-} + VV" , "f")
-        legend.AddEntry(self.qcd,"QCD","f")
         for signal in self.signals:
             name=signal.GetName()
             begin=name.find("Wprime")+6
@@ -369,51 +315,12 @@ class ChargedHiggsPlot:
         output.cd()
         self.canvas.Write()
         self.data.Write()
-        self.qcd.Write()
         self.ewk.Write()
         self.top.Write()
         self.canvas.SaveAs(outputDir+'/'+self.name+'.pdf')
         #self.canvas.SaveAs(outputDir+'/'+self.name+'.eps')
         #self.canvas.SaveAs(outputDir+'/'+self.name+'.C')
 
-    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-    #does the QCD fit
-    def getNorms(self):
-        data=self.data.Clone("data")
-        backgrounds=TObjArray(3)
-        backgrounds.Add(self.qcd.Clone(self.name+'_qcd_fitRes'))
-        backgrounds.Add(self.ewk.Clone(self.name+'_ewk_fitRes'))
-        backgrounds.Add(self.top.Clone(self.name+'_top_fitRes'))
-
-        self.fitter=TFractionFitter(data,backgrounds)
-        for binNo in range(self.nBins+2):
-            for hist in [data,backgrounds[0],backgrounds[1],backgrounds[2]]:
-                if hist.GetBinContent(binNo)<5: self.fitter.ExcludeBin(binNo) #can't have bins with very small content included in fit
-
-        status=self.fitter.Fit()
-        
-        result={}
-        if status==0:
-            value=Double()
-            error=Double()
-
-            fitChi2[self.nB][self.channel]=self.fitter.GetChisquare()
-            fitNDF[self.nB][self.channel]=self.fitter.GetNDF()
-            
-            self.fitter.GetResult(0,value,error)
-            result['qcd']=value*data.Integral(0,self.nBins+1)
-            QCDFrac[self.nB][self.channel]=value
-            QCDFracUnc[self.nB][self.channel]=error
-            
-            self.fitter.GetResult(1,value,error)
-            result['ewk']=value*data.Integral(0,self.nBins+1)
-            self.fitter.GetResult(2,value,error)
-            result['top']=value*data.Integral(0,self.nBins+1)
-            
-        return result
-    
-                                
 ##################################################################################################################################################################
                                     
 if __name__=='__main__':
@@ -423,13 +330,6 @@ if __name__=='__main__':
     for n in bJetRequirements:
         yields[n]={}
 
-        if doFracFit:
-            plots+=[#ChargedHiggsPlot(name='corr_met_fitRes',distribution='corr_met_ChargedHiggsCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='el'),
-                    ChargedHiggsPlot(name='electron0_RelIso_fitRes',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=90,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
-                    #ChargedHiggsPlot(name='corr_met_fitRes',distribution='corr_met_ChargedHiggsCalc',nBins=250,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel='mu'),
-                    #ChargedHiggsPlot(name='muon0_RelIso_fitRes',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=250,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
-                    ]
-            
         if doCutTable:
             plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
                     ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu')
@@ -471,14 +371,14 @@ if __name__=='__main__':
         print "".ljust(nameWidth),
         for n in bJetRequirements: print n.ljust(cWidth),
         print
-        for sample in ['Data','QCD']: #,'W+light','W+c','W+b']:
+        for sample in ['Data']: #,'W+light','W+c','W+b']:
             print sample.ljust(nameWidth),
             for n in bJetRequirements:
                 try: print str(int(round(yields[n][c][sample]))).ljust(cWidth),
                 except: pass
             print
         for sample in samples:
-            if (c=='el' and 'SingleMu' in sample.name) or (c=='mu' and 'SingleEl' in sample.name) or 'QCD_' in sample.name: continue
+            if (c=='el' and 'SingleMu' in sample.name) or (c=='mu' and 'SingleEl' in sample.name): continue
             if sample.isData: continue
             print sample.name.ljust(nameWidth),
             for n in bJetRequirements:
@@ -494,14 +394,3 @@ if __name__=='__main__':
             print str(round(yields[n][c]['Total Background']/yields[n][c]['Data'],3)).ljust(cWidth),
         print 3*'\n'
         
-if doFracFit:
-    for c in channels:
-        print 'CHANNEL:',c
-        for n in bJetRequirements:
-            print 'nB:',n
-            print 'QCDFrac =',QCDFrac[n][c]
-            print 'QCDFracUnc =',QCDFracUnc[n][c]
-            print "fake rate:",fakeRate[n][c]
-            print '100*QCDFracUnc/QCDFrac =',100*QCDFracUnc[n][c]/QCDFrac[n][c]
-            print 'chi2/nDF =',fitChi2[n][c]/fitNDF[n][c]
-        print
