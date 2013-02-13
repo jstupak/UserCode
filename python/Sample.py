@@ -150,6 +150,3 @@ samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+[TTbar_Powh
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 
-#problemSamples=[dataMuC_prompt,dataMuC_prompt_ext,dataElC_prompt_ext]
-#allSamples=problemSamples
-allSamples=[dataElC_prompt]
