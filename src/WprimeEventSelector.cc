@@ -543,8 +543,8 @@ bool WprimeEventSelector::operator()( edm::EventBase const & event, pat::strbits
             bool _passpf = true;
             bool _isTagged = false;
 
-            TLorentzVector jetP4 = correctJet(*_ijet);
-            _isTagged = isJetTagged(*_ijet);
+            TLorentzVector jetP4 = correctJet(*_ijet,event);
+            _isTagged = isJetTagged(*_ijet, event);
 
             // jet cuts
             while(1){ 
@@ -636,7 +636,7 @@ bool WprimeEventSelector::operator()( edm::EventBase const & event, pat::strbits
                 //reco::PFMET const & met = mhType1CorrMet->at(0);
                 pat::MET const & met = mhMet->at(0);
 
-                correctedMET_p4 = correctMet(*mpMet);
+                correctedMET_p4 = correctMet(*mpMet,event);
 
                 while(1){ 
 
