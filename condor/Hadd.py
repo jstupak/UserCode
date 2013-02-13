@@ -1,4 +1,4 @@
-form os import environ
+from os import environ
 
 #inputPathBase='/uscms_data/d1/jstupak/chargedHiggs'
 #inputPathBase=environ["PWD"]
