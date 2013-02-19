@@ -14,10 +14,10 @@ if len(argv)>1:
     inputDir=argv[1]
 else:
     inputDir='/uscms_data/d1/jstupak/chargedHiggs/2013_2_8/test'
+    #inputDir='/uscms_data/d2/dsperka/8TeV/Samples/07Feb_All'
 
-bJetRequirements=['0p','0','1','1p','2p']
-
-channels=['el','mu']
+doCuts=['0p','0','1','1p','2p','3p','final']
+doChannels=['el','mu']
 
 doCutTable=True   #produce selection yield table
 
@@ -52,13 +52,14 @@ otherSigmaFracUnc = 0.20
                 
 #---------------------------------------------------------------------------------------------------------------------------------------------
 
-if not os.path.isdir(outputDir): os.system("mkdir -p "+outputDir)
+if not os.path.isdir(outputDir) and not DEBUG: os.system("mkdir -p "+outputDir)
 output=TFile(outputDir+'/plots.root',"RECREATE")
+if DEBUG: output=TFile('plots.root',"RECREATE")
 
 class ChargedHiggsPlot:
-    
-    def __init__(self,name,distribution,nBins=100,xMin=0,xMax=100,xTitle='',yLog=True,nB="0",otherCuts='',channel='el'):
-        self.name=name; self.distribution=distribution; self.nBins=nBins; self.xMin=xMin; self.xMax=xMax; self.xTitle=xTitle; self.yLog=yLog; self.nB=nB; self.otherCuts=otherCuts; self.channel=channel;
+
+    def __init__(self,name,distribution,nBins=100,xMin=0,xMax=100,xTitle='',yLog=True,cuts="0",channel='el'):
+        self.name=name; self.distribution=distribution; self.nBins=nBins; self.xMin=xMin; self.xMax=xMax; self.xTitle=xTitle; self.yLog=yLog; self.cuts=cuts; self.channel=channel;
                       
     def Prepare(self):
         result={}
@@ -67,22 +68,27 @@ class ChargedHiggsPlot:
         if self.channel=='el': cuts+='&&'+elSelectionCuts
         elif self.channel=='mu': cuts+='&&'+muSelectionCuts
 
-        if self.nB=="0":
+        if self.cuts=="0":
             bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==0)'
-        elif self.nB=="0p":
+        elif self.cuts=="0p":
             bTagCut='1'
-        elif self.nB=="1":
+        elif self.cuts=="1":
             bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==1)'
-        elif self.nB=="1p":
+        elif self.cuts=="1p" or self.cuts=="final":
             bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)>=1)'
-        elif self.nB=="2":
+        elif self.cuts=="2":
             bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)==2)'
-        elif self.nB=="2p":
+        elif self.cuts=="2p":
             #bTagCut='((jet_0_tag_ChargedHiggsCalc + jet_1_tag_ChargedHiggsCalc)>=2)'
             bTagCut='((jet_0_tag_ChargedHiggsCalc==1 && (jet_1_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc + jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 1 ) || (jet_1_tag_ChargedHiggsCalc==1 && (jet_0_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc + jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 1))'
+        elif self.cuts=="3p":
+            bTagCut='((jet_0_tag_ChargedHiggsCalc==1 && (jet_1_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc +jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 1 ) || (jet_1_tag_ChargedHiggsCalc==1 && (jet_0_tag_ChargedHiggsCalc + jet_2_tag_ChargedHiggsCalc + jet_3_tag_ChargedHiggsCalc + jet_4_tag_ChargedHiggsCalc + jet_5_tag_ChargedHiggsCalc + jet_6_tag_ChargedHiggsCalc + jet_7_tag_ChargedHiggsCalc + jet_8_tag_ChargedHiggsCalc + jet_9_tag_ChargedHiggsCalc) >= 2))'
+                                    
+        if self.cuts=='final':
+            cuts+='&& '+finalCuts
 
         #make name unique
-        self.name+='_nB'+self.nB+'_'+self.channel
+        self.name+='_'+self.cuts+'_'+self.channel
 
         if (self.channel == 'el'): lumi=elLumi
         elif (self.channel == 'mu'): lumi=muLumi
@@ -93,6 +99,12 @@ class ChargedHiggsPlot:
             if (self.channel=='el' and 'SingleMu' in sample.name) or (self.channel=='mu' and 'SingleEl' in sample.name): continue
             
             sample.file=TFile(inputDir+'/'+sample.name+'.root')
+            if DEBUG and sample.isSignal: continue
+            if DEBUG and sample.isData:
+                if self.channel=='el' and 'SingleElectron_13Jul2012A' in sample.name: sample.file=TFile(inputDir+'/Data_el_19pt6fb.root')
+                elif self.channel=='mu' and 'SingleMu_13Jul2012A' in sample.name: sample.file=TFile(inputDir+'/Data_mu_19pt6fb.root')
+                else: continue
+                
             sample.tree=sample.file.Get(treeName)
             hName=self.name+'_'+sample.name
             sample.h=TH1F(hName,";"+self.xTitle,self.nBins,self.xMin,self.xMax)
@@ -107,30 +119,30 @@ class ChargedHiggsPlot:
 
             if sample.name=='WJets':
                 sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc==0)','goff')
+                result['W+light']=sample.h.Integral(0,self.nBins+1)
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc>0)','goff')
+                result['W+c']=sample.h.Integral(0,self.nBins+1)-result['W+light']
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&&'+bTagCut+'&& n_Bjets_ChargedHiggsCalc>0)','goff')
+                result['W+b']=sample.h.Integral(0,self.nBins+1)-result['W+light']-result['W+c']
                 bTagEff=sample.h.Integral(0,self.nBins+1)
 
                 #get shape from untagged sample
                 sample.tree.Draw(self.distribution+">>"+hName,weight+'*'+str(SFWj)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc==0)','goff')
-                result['W+light']=sample.h.Integral(0,self.nBins+1)
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWc)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc==0 && n_Cjets_ChargedHiggsCalc>0)','goff')
-                result['W+c']=sample.h.Integral(0,self.nBins+1)-result['W+light']
                 sample.tree.Draw(self.distribution+">>+"+hName,weight+'*'+str(SFWb)+'*('+cuts+'&& n_Bjets_ChargedHiggsCalc>0)','goff')
-                result['W+b']=sample.h.Integral(0,self.nBins+1)-result['W+light']-result['W+c']
                 bTagEff/=sample.h.Integral(0,self.nBins+1)
-
-                sample.h.Scale(bTagEff) #get proper normalization
-                result['W+b']*=bTagEff*lumi*sample.crossSection/sample.nEvents
-                result['W+c']*=bTagEff*lumi*sample.crossSection/sample.nEvents
-                result['W+b']*=bTagEff*lumi*sample.crossSection/sample.nEvents
+                sample.h.Scale(bTagEff) #normalize to tagged integrala
                 
+                result['W+light']*=lumi*sample.crossSection/sample.nEvents
+                result['W+c']*=lumi*sample.crossSection/sample.nEvents
+                result['W+b']*=lumi*sample.crossSection/sample.nEvents
+                                                                                
             else: 
                 nSelectedRaw=sample.tree.Draw(self.distribution+">>"+hName,weight+'*('+cuts+'&&'+bTagCut+')','goff')
 
             if sample.isMC and sample.h.Integral(0,self.nBins+1)!=0: sample.h.Scale(lumi*sample.crossSection/sample.nEvents)
 
-            if DEBUG: #for event comparison
+            if DEBUG and False: #for event comparison
                 if 'TTbar_Powheg' in sample.name and self.channel=='el':
                     sample.tree.SetScanField(0)
                     print '\n',sample.name,'   ',self.channel
@@ -149,6 +161,7 @@ class ChargedHiggsPlot:
         for sample in samples:
             if (self.channel=='el' and 'SingleMu' in sample.name) or (self.channel=='mu' and 'SingleEl' in sample.name): continue
             elif sample.isSignal:
+                if DEBUG: continue
                 sample.h.Scale(20)
                 sample.h.SetLineColor(1)
                 sample.h.SetLineStyle(6+len(self.signals))
@@ -156,7 +169,9 @@ class ChargedHiggsPlot:
             elif sample.isBackground:
                 if sample.name[0]=='T': self.top.Add(sample.h)
                 else: self.ewk.Add(sample.h)
-            elif sample.isData: self.data.Add(sample.h)
+            elif sample.isData:
+                if DEBUG and not ('SingleElectron_13Jul2012A' in sample.name or 'SingleMu_13Jul2012A' in sample.name): continue
+                self.data.Add(sample.h)
             sample.h.SetLineWidth(2)
                         
         self.ewk.SetFillColor(ROOT.kGreen-3)
@@ -253,7 +268,7 @@ class ChargedHiggsPlot:
         legend.AddEntry(self.ewk,"W#rightarrowl#nu + Z/#gamma*#rightarrowl^{+}l^{-} + VV" , "f")
         for signal in self.signals:
             name=signal.GetName()
-            begin=name.find("Wprime")+6
+            begin=name.find("ChargedHiggs")+6
             end=name.find("Right")-2
             dot=end-1
             mass=name[begin:dot]+'.'+name[dot:end]
@@ -271,18 +286,22 @@ class ChargedHiggsPlot:
         lumi=round(lumi,2)
         prelimTex.DrawLatex(0.87, 0.95, "CMS Preliminary, "+str(lumi)+" fb^{-1} at #sqrt{s} = 8 TeV");
 
-        if self.nB=="0":
+        if self.cuts=="0":
             bTagLabel="N_{b tags} = 0"
-        elif self.nB=="0p":
+        elif self.cuts=="0p":
             bTagLabel="N_{b tags} #geq 0"
-        elif self.nB=="1":
+        elif self.cuts=="1":
             bTagLabel="N_{b tags} = 1"
-        elif self.nB=="1p":
+        elif self.cuts=="1p":
             bTagLabel="N_{b tags} #geq 1"
-        elif self.nB=="2":
+        elif self.cuts=="2":
             bTagLabel="N_{b tags} = 2"
-        elif self.nB=="2p":
+        elif self.cuts=="2p":
             bTagLabel="N_{b tags} #geq 2"
+        elif self.cuts=="3p":
+            bTagLabel="N_{b tags} #geq 3"
+        elif self.cuts=="final":
+            bTagLabel="N_{b tags} #geq 1"
         channelTex = TLatex()
         channelTex.SetNDC()
         channelTex.SetTextSize(0.08)
@@ -327,70 +346,73 @@ if __name__=='__main__':
 
     yields={}
     plots=[]
-    for n in bJetRequirements:
-        yields[n]={}
-
+    for cuts in doCuts:
+        yields[cuts]={}
         if doCutTable:
-            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
-                    ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu')
+            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='electron p_{T} [GeV]',yLog=True,cuts=cuts,channel='el'),
+                    ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,cuts=cuts,channel='mu')
                     ]
 
         else:
-            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='electron p_{T} [GeV]',yLog=True,nB=n,channel='el'),
-                    ChargedHiggsPlot(name='electron0_eta',distribution='elec_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,nB=n,channel='el'),
-                    ChargedHiggsPlot(name='electron0_RelIso',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,nB=n,channel='el'),
-                    
-                    #ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='muon p_{T} [GeV]',yLog=True,nB=n,channel='mu'),
-                    #ChargedHiggsPlot(name='muon0_eta',distribution='muon_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,nB=n,channel='mu'),
-                    #ChargedHiggsPlot(name='muon0_RelIso',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,nB=n,channel='mu')
+            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='electron p_{T} [GeV]',yLog=True,cuts=cuts,channel='el'),
+                    ChargedHiggsPlot(name='electron0_eta',distribution='elec_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,cuts=cuts,channel='el'),
+                    ChargedHiggsPlot(name='electron0_RelIso',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,cuts=cuts,channel='el'),
+
+                    #ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='muon p_{T} [GeV]',yLog=True,cuts=cuts,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_eta',distribution='muon_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,cuts=cuts,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_RelIso',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,cuts=cuts,channel='mu')
                     ]
-            for c in channels:
-                plots+=[ChargedHiggsPlot(name='BestJetJet2W_M',distribution='BestJetJet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='Jet1Jet2W_M',distribution='Jet1Jet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,nB=n,channel=c),
-                        ChargedHiggsPlot(name='corr_met',distribution='corr_met_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet0_pt',distribution='jet_0_pt_ChargedHiggsCalc',nBins=130,xMin=0,xMax=1300,xTitle='p_{T} (jet1) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet0_eta',distribution='jet_0_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet1_pt',distribution='jet_1_pt_ChargedHiggsCalc',nBins=120,xMin=0,xMax=1200,xTitle='p_{T} (jet2) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet1_eta',distribution='jet_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet2_pt',distribution='jet_2_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='PFjet2_eta',distribution='jet_2_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,nB=n,channel=c),
-                        ChargedHiggsPlot(name='TopMass_Best',distribution='BestTop_LjetsTopoCalcNew',nBins=100,xMin=0,xMax=1000,xTitle='M(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,nB=n,channel=c),
-                        #ChargedHiggsPlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,nB=n,channel=c),
-                        ChargedHiggsPlot(name='nPV',distribution='nPV_ChargedHiggsCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,nB=n,channel=c)
+
+
+            for channel in doChannels:
+                plots+=[ChargedHiggsPlot(name='BestJetJet2W_M',distribution='BestJetJet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='Jet1Jet2W_M',distribution='Jet1Jet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        ChargedHiggsPlot(name='corr_met',distribution='corr_met_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='E_{T}^{miss} [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet0_pt',distribution='jet_0_pt_ChargedHiggsCalc',nBins=130,xMin=0,xMax=1300,xTitle='p_{T} (jet1) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet0_eta',distribution='jet_0_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet1_pt',distribution='jet_1_pt_ChargedHiggsCalc',nBins=120,xMin=0,xMax=1200,xTitle='p_{T} (jet2) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet1_eta',distribution='jet_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet2_pt',distribution='jet_2_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='PFjet2_eta',distribution='jet_2_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,cuts=cuts,channel=c),
+                        ChargedHiggsPlot(name='TopMass_Best',distribution='BestTop_LjetsTopoCalcNew',nBins=100,xMin=0,xMax=1000,xTitle='M(best jet,W) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,cuts=cuts,channel=c),
+                        #ChargedHiggsPlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,cuts=cuts,channel=c),
+                        ChargedHiggsPlot(name='nPV',distribution='nPV_ChargedHiggsCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,cuts=cuts,channel=c)
                         ]
-                
+
     for plot in plots:
-        yields[plot.nB][plot.channel]=plot.Prepare()
+        yields[plot.cuts][plot.channel]=plot.Prepare()
         plot.Draw()
 
     cWidth=15; nameWidth=35
-    for c in channels:
-        print ("CHANNEL:"+c).ljust(nameWidth+(2*cWidth+1)),"N_b"
+    for channel in doChannels:
+        print ("CHANNEL:"+channel).ljust(nameWidth+(2*cWidth+1)),"N_b"
         print "".ljust(nameWidth),
-        for n in bJetRequirements: print n.ljust(cWidth),
+        for cuts in doCuts: print cuts.ljust(cWidth),
         print
-        for sample in ['Data']: #,'W+light','W+c','W+b']:
+        for sample in ['Data','W+light','W+c','W+b']:
             print sample.ljust(nameWidth),
-            for n in bJetRequirements:
-                try: print str(int(round(yields[n][c][sample]))).ljust(cWidth),
+            for cuts in doCuts:
+                try: print str(int(round(yields[cuts][channel][sample]))).ljust(cWidth),
                 except: pass
             print
         for sample in samples:
-            if (c=='el' and 'SingleMu' in sample.name) or (c=='mu' and 'SingleEl' in sample.name): continue
+            if (channel=='el' and 'SingleMu' in sample.name) or (channel=='mu' and 'SingleEl' in sample.name): continue
             if sample.isData: continue
+            if DEBUG and sample.isSignal: continue
             print sample.name.ljust(nameWidth),
-            for n in bJetRequirements:
-                print str(int(round(yields[n][c][sample.name]))).ljust(cWidth),
+            for cuts in doCuts:
+                print str(int(round(yields[cuts][channel][sample.name]))).ljust(cWidth),
+                #print yields[cuts][channel][sample.name]
             print
         for sample in ['Total Background']:
             print sample.ljust(nameWidth),
-            for n in bJetRequirements:
-                print str(int(round(yields[n][c][sample]))).ljust(cWidth),
+            for cuts in doCuts:
+                print str(int(round(yields[cuts][channel][sample]))).ljust(cWidth),
             print
         print 'Background/Data'.ljust(nameWidth),
-        for n in bJetRequirements:
-            print str(round(yields[n][c]['Total Background']/yields[n][c]['Data'],3)).ljust(cWidth),
+        for cuts in doCuts:
+            print str(round(yields[cuts][channel]['Total Background']/yields[cuts][channel]['Data'],3)).ljust(cWidth),
         print 3*'\n'
         
