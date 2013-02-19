@@ -61,6 +61,7 @@ dataMuB=Sample('SingleMu_13Jul2012B',sampleType='data',filesPerJob=5,inputListFi
 dataMuC=Sample('SingleMu_24Aug2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_24Aug2012_v1_TLBSM_53x_v2_cff.txt')
 dataMuC_prompt=Sample('SingleMu_Prompt2012C1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_cff.txt')
 dataMuC_prompt_ext=Sample('SingleMu_Prompt2012C2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_extension_v1_cff.txt')
+dataMuC_recover=Sample('SingleMu_11Dec2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_Run2012C_EcalRecover_11Dec2012_v1_TLBSM_53x_v2_cff.txt')
 dataMuD_prompt=Sample('SingleMu_Prompt2012D1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_cff.txt')
 dataMuD_prompt_ext=Sample('SingleMu_Prompt2012D2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleMu_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_extension_v2_cff.txt')
 
@@ -70,17 +71,18 @@ dataElB=Sample('SingleElectron_13Jul2012B',sampleType='data',filesPerJob=5,input
 dataElC=Sample('SingleElectron_24Aug2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_24Aug2012_v1_TLBSM_53x_v2_cff.txt')
 dataElC_prompt=Sample('SingleElectron_Prompt2012C1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_cff.txt')
 dataElC_prompt_ext=Sample('SingleElectron_Prompt2012C2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012C_PromptReco_v2_TLBSM_53x_v2_extension_v1_cff.txt')
+dataElC_recover=Sample('SingleElectron_11Dec2012C',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_Run2012C_EcalRecover_11Dec2012_v1_TLBSM_53x_v2_cff.txt')
 dataElD_prompt=Sample('SingleElectron_Prompt2012D1',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_bugfix_cff.txt')
 dataElD_prompt_ext=Sample('SingleElectron_Prompt2012D2',sampleType='data',filesPerJob=5,inputListFile='src/LJMet/Com/python/Samples_2012/SingleElectron_StoreResults_Run2012D_PromptReco_v1_TLBSM_53x_v2_extension_v1_cff.txt')
 
-data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataMuD_prompt,dataMuD_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt,dataElC_prompt_ext,dataElD_prompt,dataElD_prompt_ext]
+data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,dataMuC_recover,dataMuD_prompt,dataMuD_prompt_ext,dataElA,dataElA_recover,dataElB,dataElC,dataElC_prompt,dataElC_prompt_ext,dataElC_recover,dataElD_prompt,dataElD_prompt_ext]
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-WJets=Sample('WJets',sampleType='ewk',altName='W+Jets',crossSection=36257.2,nEvents=76041475.0,inputListFile='src/LJMet/Com/python/Samples_2012/WJetsToLNu_TuneZ2Star_8TeV_madgraph_tarball_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_v2_TLBSM_53x_v2_cff.txt')
+WJets=Sample('WJets',sampleType='ewk',altName='W+Jets',crossSection=37503.0,nEvents=76041475.0,inputListFile='src/LJMet/Com/python/Samples_2012/WJetsToLNu_TuneZ2Star_8TeV_madgraph_tarball_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_v2_TLBSM_53x_v2_cff.txt')
 WW=Sample('WW',sampleType='ewk',crossSection=54.838,nEvents=10000431.0,inputListFile='src/LJMet/Com/python/Samples_2012/WW_TuneZ2star_8TeV_pythia6_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
-TTbar_Madgraph=Sample('TTbar_Madgraph',sampleType='ewk',altName='TTbar',crossSection=234,nEvents=6923750.0,inputListFile='src/LJMet/Com/python/Samples_2012/TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt') # approx NNLO
-TTbar_Powheg=Sample('TTbar_Powheg',sampleType='ewk',altName='TTbar',crossSection=234,nEvents=21591169.0,inputListFile='src/LJMet/Com/python/Samples_2012/TT_CT10_TuneZ2star_8TeV_powheg_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v2_TLBSM_53x_v2_cff.txt') # approx NNLO xsec
+TTbar_Madgraph=Sample('TTbar_Madgraph',sampleType='ewk',altName='TTbar',crossSection=234.0,nEvents=6923750.0,inputListFile='src/LJMet/Com/python/Samples_2012/TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt') # approx NNLO
+TTbar_Powheg=Sample('TTbar_Powheg',sampleType='ewk',altName='TTbar',crossSection=234.0,nEvents=21591169.0,inputListFile='src/LJMet/Com/python/Samples_2012/TT_CT10_TuneZ2star_8TeV_powheg_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v2_TLBSM_53x_v2_cff.txt') # approx NNLO xsec
 ZJets=Sample('ZJets_M50',sampleType='ewk',altName='Z+Jets',crossSection=3503.71,nEvents=30459503.0,inputListFile='src/LJMet/Com/python/Samples_2012/DYJetsToLL_M_50_TuneZ2Star_8TeV_madgraph_tarball_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
 ZZ=Sample('ZZ',sampleType='ewk',crossSection=1,nEvents=9799908,inputListFile='src/LJMet/Com/python/Samples_2012/ZZ_TuneZ2star_8TeV_pythia6_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
 T_tW=Sample('T_tW',sampleType='ewk',altName='T_tW',crossSection=11.1,nEvents=497658.0,inputListFile='src/LJMet/Com/python/Samples_2012/T_tW_channel_DR_TuneZ2star_8TeV_powheg_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
@@ -103,10 +105,10 @@ for sample in data+EWK:
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-chargedHiggs200=Sample('chargedHiggs200',sampleType='signal',altName='H^{#pm} (m=200 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-200_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs200=Sample('chargedHiggs200',sampleType='signal',altName='H^{#pm} (m=200 GeV)',crossSection=.132*1.485,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-200_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 chargedHiggs300=Sample('chargedHiggs300',sampleType='signal',altName='H^{#pm} (m=300 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-300_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 #chargedHiggs400=Sample('chargedHiggs400',sampleType='signal',altName='H^{#pm} (m=400 GeV)',crossSection=1,filesPerJob=10,nEvents=,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-400_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
-chargedHiggs500=Sample('chargedHiggs500',sampleType='signal',altName='H^{#pm} (m=500 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-500_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
+chargedHiggs500=Sample('chargedHiggs500',sampleType='signal',altName='H^{#pm} (m=500 GeV)',crossSection=.017*1.695,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-500_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 chargedHiggs600=Sample('chargedHiggs600',sampleType='signal',altName='H^{#pm} (m=600 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-600_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 chargedHiggs700=Sample('chargedHiggs700',sampleType='signal',altName='H^{#pm} (m=700 GeV)',crossSection=1,filesPerJob=10,nEvents=900000,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-700_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 
@@ -143,10 +145,11 @@ signal=[Wprime800Right,Wprime1100Right,Wprime1200Right,Wprime1300Right,Wprime140
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #allSamples=signal+QCD+EWK+data
-#samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+QCD+[TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
+#samplesForPlotting=[chargedHiggs200,chargedHiggs500]+QCD+[TTbar_Madgraph,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
 allSamples=signal+EWK+data
-samplesForPlotting=[chargedHiggs200,chargedHiggs300,chargedHiggs500]+[TTbar_Powheg,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
+samplesForPlotting=[chargedHiggs200,chargedHiggs500]+[TTbar_Madgraph,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 
+#allSamples=[dataMuC_recover,dataElC_recover]
