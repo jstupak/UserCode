@@ -27,12 +27,22 @@ doBTS=False
     
 outputDir=inputDir+'/plots'
 
+sharedSelectionCuts='jet_0_pt_ChargedHiggsCalc >= 40 && jet_1_pt_ChargedHiggsCalc >= 40'
+elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 30 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
+muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 25 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
+
+finalCuts='BestTop_Pt_LjetsTopoCalcNew > 85 && Jet1Jet2_Pt_LjetsTopoCalcNew > 140 && 130 < BestTop_LjetsTopoCalcNew && BestTop_LjetsTopoCalcNew < 210'
+
+
+"""
+#Wprime Cuts
+
 sharedSelectionCuts='jet_0_pt_ChargedHiggsCalc >= 120 && jet_1_pt_ChargedHiggsCalc >= 40'
 elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 50 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
 muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 50 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
 
 finalCuts='BestTop_Pt_LjetsTopoCalcNew > 85 && Jet1Jet2_Pt_LjetsTopoCalcNew > 140 && 130 < BestTop_LjetsTopoCalcNew && BestTop_LjetsTopoCalcNew < 210'
-
+"""
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 elLumi=19624
@@ -163,7 +173,7 @@ class ChargedHiggsPlot:
                 if DEBUG: continue
                 sample.h.Scale(20)
                 sample.h.SetLineColor(1)
-                sample.h.SetLineStyle(6+len(self.signals))
+                sample.h.SetLineStyle(2+len(self.signals))
                 self.signals+=[sample.h]
             elif sample.isBackground:
                 if sample.name[0]=='T': self.top.Add(sample.h)
@@ -189,6 +199,7 @@ class ChargedHiggsPlot:
 
 
     def Draw(self):
+        gStyle.SetErrorX(0.5)
 
         self.canvas=TCanvas(self.name,"",1000,800)
 
@@ -230,10 +241,10 @@ class ChargedHiggsPlot:
         self.data.GetYaxis().SetTitle(yTitle)
 
         self.uPad.cd()
-        self.data.Draw("E1") #draw data first because its easier to format a TH1 than a THStack
+        self.data.Draw("E1 X0") #draw data first because its easier to format a TH1 than a THStack
         self.backgroundStack.Draw("SAME HIST")
         for signal in self.signals: signal.Draw("SAME HIST")
-        self.data.Draw("SAME E1") #redraw data so its not hidden
+        self.data.Draw("SAME E1 X0") #redraw data so its not hidden
         self.uPad.RedrawAxis()
 
         #calculate stat+sys uncertainty
@@ -253,14 +264,14 @@ class ChargedHiggsPlot:
             totalUnc=sqrt(lumiUnc+sigmaUnc+statUnc)
             self.uncBand.SetBinError(binNo,totalUnc)
             self.background.SetBinError(binNo,totalUnc)
-            print binNo, self.uncBand.GetBinContent(binNo),self.uncBand.GetBinError(binNo)
         self.uncBand.SetFillStyle(3344)
         self.uncBand.SetFillColor(1)
         self.uncBand.SetLineColor(1)
+        self.uncBand.SetMarkerSize(0)
         gStyle.SetHatchesLineWidth(1)
         self.uncBand.Draw("SAME E2")
         
-        legend=TLegend(0.60,0.60,0.90,0.90)
+        legend=TLegend(0.55,0.55,0.90,0.90)
         legend.SetShadowColor(0);
         legend.SetFillColor(0);
         legend.SetLineColor(0);
@@ -269,7 +280,7 @@ class ChargedHiggsPlot:
         legend.AddEntry(self.ewk,"W#rightarrowl#nu + Z/#gamma*#rightarrowl^{+}l^{-} + VV" , "f")
         for signal in self.signals:
             mass=signal.GetName()[-3:]
-            legend.AddEntry(signal, "H^{#pm} x 20, m="+mass+" GeV", "l")
+            legend.AddEntry(signal, "H^{#pm} x 20 (m="+mass+" GeV)", "l")
         legend.AddEntry(self.uncBand , "Uncertainty" , "f")
         legend.Draw("SAME")
         
