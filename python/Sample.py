@@ -81,7 +81,7 @@ data=[dataMuA,dataMuA_recover,dataMuB,dataMuC,dataMuC_prompt,dataMuC_prompt_ext,
 
 WJets=Sample('WJets',sampleType='ewk',altName='W+Jets',crossSection=37503.0,nEvents=76041475.0,inputListFile='src/LJMet/Com/python/Samples_2012/WJetsToLNu_TuneZ2Star_8TeV_madgraph_tarball_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_v2_TLBSM_53x_v2_cff.txt')
 WW=Sample('WW',sampleType='ewk',crossSection=54.838,nEvents=10000431.0,inputListFile='src/LJMet/Com/python/Samples_2012/WW_TuneZ2star_8TeV_pythia6_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
-TTbar_Madgraph=Sample('TTbar_Madgraph',sampleType='ewk',altName='TTbar',crossSection=234.0,nEvents=6923750.0,inputListFile='src/LJMet/Com/python/Samples_2012/TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt') # approx NNLO
+TTbar_Madgraph=Sample('TTbar_Madgraph',sampleType='ewk',filesPerJob=5,altName='TTbar',crossSection=234.0,nEvents=6923750.0,inputListFile='src/LJMet/Com/python/Samples_2012/TTJets_MassiveBinDECAY_TuneZ2star_8TeV_madgraph_tauola_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt') # approx NNLO
 TTbar_Powheg=Sample('TTbar_Powheg',sampleType='ewk',altName='TTbar',crossSection=234.0,nEvents=21591169.0,inputListFile='src/LJMet/Com/python/Samples_2012/TT_CT10_TuneZ2star_8TeV_powheg_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v2_TLBSM_53x_v2_cff.txt') # approx NNLO xsec
 ZJets=Sample('ZJets_M50',sampleType='ewk',altName='Z+Jets',crossSection=3503.71,nEvents=30459503.0,inputListFile='src/LJMet/Com/python/Samples_2012/DYJetsToLL_M_50_TuneZ2Star_8TeV_madgraph_tarball_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
 ZZ=Sample('ZZ',sampleType='ewk',crossSection=1,nEvents=9799908,inputListFile='src/LJMet/Com/python/Samples_2012/ZZ_TuneZ2star_8TeV_pythia6_tauola_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
@@ -114,6 +114,7 @@ chargedHiggs700=Sample('chargedHiggs700',sampleType='signal',altName='H^{#pm} (m
 #chargedHiggs800=Sample('chargedHiggs800',sampleType='signal',altName='H^{#pm} (m=800 GeV)',crossSection=1.828*2.071e-3,filesPerJob=10,nEvents=,inputListFile='src/LJMet/Com/python/Samples_2012/ChargedHToTB_M-800_tanBeta30_8TeV_pythia6_tauola_Summer12_DR53X_PU_S10_START53_V7C_v1_TLBSM_53x_v2.txt')
 
 signal=[chargedHiggs200,chargedHiggs300,chargedHiggs500,chargedHiggs600,chargedHiggs700] #chargedHiggs400,chargedHiggs800
+signalForPlotting=[chargedHiggs200,chargedHiggs500,chargedHiggs700]
 
 """
 Wprime800Right =Sample('Wprime800Right' ,sampleType='signal',altName='W^{'}_{R} (m=800GeV)',crossSection=1.5352,filesPerJob=19,nEvents=920654,inputListFile='src/LJMet/Com/python/Samples_2012/SingletopWprime_M_800_right_TuneZ2star_8TeV_comphep_StoreResults_Summer12_DR53X_PU_S10_START53_V7A_v1_TLBSM_53x_v2_cff.txt')
@@ -149,8 +150,7 @@ signal=[Wprime800Right,Wprime1100Right,Wprime1200Right,Wprime1300Right,Wprime140
 #samplesForPlotting=[chargedHiggs200,chargedHiggs500]+QCD+[TTbar_Madgraph,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
 allSamples=signal+EWK+data
-samplesForPlotting=[chargedHiggs200,chargedHiggs500]+[TTbar_Madgraph,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
+samplesForPlotting=signalForPlotting+[TTbar_Madgraph,T_t,Tbar_t,T_tW,Tbar_tW,T_s,Tbar_s,WJets,ZJets,WW]+data
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 
-#allSamples=[dataMuC_recover,dataElC_recover]
