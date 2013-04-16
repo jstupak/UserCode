@@ -49,7 +49,7 @@ outputDir=inputDir+'/plots'
 #H+- Cuts
 sharedSelectionCuts='jet_0_pt_ChargedHiggsCalc > 50 && jet_1_pt_ChargedHiggsCalc > 30'
 elSelectionCuts='elec_1_pt_ChargedHiggsCalc > 30 && abs(elec_1_eta_ChargedHiggsCalc) < 2.5 && elec_1_RelIso_ChargedHiggsCalc < 0.1  && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
-muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 26 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && Corr_met_chargedhiggscalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
+muSelectionCuts='muon_1_pt_ChargedHiggsCalc > 26 && abs(muon_1_eta_ChargedHiggsCalc) < 2.1 && muon_1_RelIso_ChargedHiggsCalc < 0.12 && corr_met_ChargedHiggsCalc > 20 && Muon_DeltaR_LjetsTopoCalcNew > 0.3'
 
 finalCuts='BestTop_Pt_LjetsTopoCalcNew > 85 && Jet1Jet2_Pt_LjetsTopoCalcNew > 140 && 130 < BestTop_LjetsTopoCalcNew && BestTop_LjetsTopoCalcNew < 210'
 
@@ -317,7 +317,7 @@ class ChargedHiggsPlot:
         self.backgroundStack.Draw("SAME HIST")
         for signal in self.signals:
             for s in signalsForPlotting:
-                if s.name==signal.name: signal.Draw("SAME HIST")
+                if s.name in signal.GetName(): signal.Draw("SAME HIST")
         self.data.Draw("SAME E1 X0") #redraw data so its not hidden
         self.uPad.RedrawAxis()
 
@@ -355,7 +355,7 @@ class ChargedHiggsPlot:
         for signal in self.signals:
             mass=signal.GetName()[-3:]
             for s in signalsForPlotting:
-                if s.name==signal.name: legend.AddEntry(signal, "H^{#pm} x 20 (m="+mass+" GeV)", "l")
+                if s.name in signal.GetName(): legend.AddEntry(signal, "H^{#pm} x 20 (m="+mass+" GeV)", "l")
         legend.AddEntry(self.uncBand , "Uncertainty" , "f")
         legend.Draw("SAME")
         
@@ -488,7 +488,7 @@ class ChargedHiggsPlot:
             for signal in self.signals:
                 mass=signal.GetName()[-3:]
                 for s in signalsForPlotting:
-                    if s.name==signal.name: legend.AddEntry(signal, "H^{#pm} (m="+mass+" GeV)", "l")
+                    if s.name in signal.GetName(): legend.AddEntry(signal, "H^{#pm} (m="+mass+" GeV)", "l")
             legend.Draw("SAME")
 
             #self.lPad.cd()
@@ -543,54 +543,60 @@ if __name__=='__main__':
             plots+=[ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=7000,xTitle='muon p_{T} [GeV]',yLog=True,cuts=cuts,channel='mu')]
 
         else:
-            plots+=[ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=70,xMin=0,xMax=700,xTitle='electron p_{T} [GeV]',yLog=True,cuts=cuts,channel='el'),
-                    ChargedHiggsPlot(name='electron0_eta',distribution='elec_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,cuts=cuts,channel='el'),
-                    ChargedHiggsPlot(name='electron0_RelIso',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,cuts=cuts,channel='el'),
+            plots+=[#ChargedHiggsPlot(name='electron0_pt',distribution='elec_1_pt_ChargedHiggsCalc',nBins=70,xMin=0,xMax=700,xTitle='electron p_{T} [GeV]',yLog=True,cuts=cuts,channel='el'),
+                    #ChargedHiggsPlot(name='electron0_eta',distribution='elec_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='electron #eta',yLog=False,cuts=cuts,channel='el'),
+                    #ChargedHiggsPlot(name='electron0_RelIso',distribution='elec_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='electron Rel. Isolation',yLog=True,cuts=cuts,channel='el'),
 
-                    ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=70,xMin=6,xMax=706,xTitle='muon p_{T} [GeV]',yLog=True,cuts=cuts,channel='mu'),
-                    ChargedHiggsPlot(name='muon0_eta',distribution='muon_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,cuts=cuts,channel='mu'),
-                    ChargedHiggsPlot(name='muon0_RelIso',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,cuts=cuts,channel='mu')
+                    #ChargedHiggsPlot(name='muon0_pt',distribution='muon_1_pt_ChargedHiggsCalc',nBins=70,xMin=6,xMax=706,xTitle='muon p_{T} [GeV]',yLog=True,cuts=cuts,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_eta',distribution='muon_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='muon #eta',yLog=False,cuts=cuts,channel='mu'),
+                    #ChargedHiggsPlot(name='muon0_RelIso',distribution='muon_1_RelIso_ChargedHiggsCalc',nBins=30,xMin=0,xMax=0.15,xTitle='muon Rel. Isolation',yLog=True,cuts=cuts,channel='mu')
                     ]
 
 
             for channel in doChannels:
                 plots+=[###ChargedHiggsPlot(name='BestJetJet2W_M',distribution='BestJetJet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,cuts=cuts,channel=channel),
                         ###ChargedHiggsPlot(name='Jet1Jet2W_M',distribution='Jet1Jet2W_M_LjetsTopoCalcNew',nBins=68,xMin=100,xMax=3500,xTitle='M(tb) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='corr_met',distribution='corr_met_ChargedHiggsCalc',nBins=70,xMin=0,xMax=700,xTitle='E_{T}^{miss} [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet0_pt',distribution='jet_0_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='p_{T} (jet1) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet0_eta',distribution='jet_0_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet1_pt',distribution='jet_1_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet2) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet1_eta',distribution='jet_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet2_pt',distribution='jet_2_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet2_eta',distribution='jet_2_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet3_pt',distribution='jet_3_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet4) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet3_eta',distribution='jet_3_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet4)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet4_pt',distribution='jet_4_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet5) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet4_eta',distribution='jet_4_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet5)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet5_pt',distribution='jet_5_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet6) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet5_eta',distribution='jet_5_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet6)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet6_pt',distribution='jet_6_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet7) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet6_eta',distribution='jet_6_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet7)',yLog=False,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet7_pt',distribution='jet_7_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet8) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='PFjet7_eta',distribution='jet_7_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet8)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='corr_met',distribution='corr_met_ChargedHiggsCalc',nBins=70,xMin=0,xMax=700,xTitle='E_{T}^{miss} [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet0_pt',distribution='jet_0_pt_ChargedHiggsCalc',nBins=100,xMin=0,xMax=1000,xTitle='p_{T} (jet1) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet0_eta',distribution='jet_0_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet1)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet1_pt',distribution='jet_1_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet2) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet1_eta',distribution='jet_1_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet2)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet2_pt',distribution='jet_2_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet3) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet2_eta',distribution='jet_2_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet3)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet3_pt',distribution='jet_3_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet4) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet3_eta',distribution='jet_3_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet4)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet4_pt',distribution='jet_4_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet5) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet4_eta',distribution='jet_4_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet5)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet5_pt',distribution='jet_5_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet6) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet5_eta',distribution='jet_5_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet6)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet6_pt',distribution='jet_6_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet7) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet6_eta',distribution='jet_6_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet7)',yLog=False,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet7_pt',distribution='jet_7_pt_ChargedHiggsCalc',nBins=80,xMin=0,xMax=800,xTitle='p_{T} (jet8) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='PFjet7_eta',distribution='jet_7_eta_ChargedHiggsCalc',nBins=50,xMin=-2.5,xMax=2.5,xTitle='#eta (jet8)',yLog=False,cuts=cuts,channel=channel),
                         
                         ###ChargedHiggsPlot(name='TopMass_Best',distribution='BestTop_LjetsTopoCalcNew',nBins=100,xMin=0,xMax=1000,xTitle='M(best jet,W) [GeV]',yLog=True,cuts=cuts,channel=channel),
                         ###ChargedHiggsPlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='ST',distribution='jet_0_pt_ChargedHiggsCalc+jet_1_pt_ChargedHiggsCalc+((elec_1_pt_ChargedHiggsCalc>0)*elec_1_pt_ChargedHiggsCalc)+((muon_1_pt_ChargedHiggsCalc>0)*muon_1_pt_ChargedHiggsCalc)+corr_met_ChargedHiggsCalc',nBins=150,xMin=0,xMax=3000,xTitle='S_{T} [GeV]',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='nPV',distribution='nPV_ChargedHiggsCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,cuts=cuts,channel=channel),
-                        ChargedHiggsPlot(name='Nj',distribution='nSelJets_CommonCalc',nBins=7,xMin=1.5,xMax=8.5,xTitle='N_{jets}',yLog=True,cuts=cuts,channel=channel)
-                    ]
+                        #ChargedHiggsPlot(name='Pt_Jet1Jet2',distribution='Jet1Jet2_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet1,jet2) [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='HT',distribution='Ht_LjetsTopoCalcNew',nBins=125,xMin=0,xMax=2500,xTitle='H_{T} [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='ST',distribution='jet_0_pt_ChargedHiggsCalc+jet_1_pt_ChargedHiggsCalc+((elec_1_pt_ChargedHiggsCalc>0)*elec_1_pt_ChargedHiggsCalc)+((muon_1_pt_ChargedHiggsCalc>0)*muon_1_pt_ChargedHiggsCalc)+corr_met_ChargedHiggsCalc',nBins=150,xMin=0,xMax=3000,xTitle='S_{T} [GeV]',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='nPV',distribution='nPV_ChargedHiggsCalc',nBins=50,xMin=0,xMax=50,xTitle='# Vertices',yLog=True,cuts=cuts,channel=channel),
+                        #ChargedHiggsPlot(name='Nj',distribution='nSelJets_CommonCalc',nBins=7,xMin=1.5,xMax=8.5,xTitle='N_{jets}',yLog=True,cuts=cuts,channel=channel)
+                        ]
                 
     if not yields.has_key('preselection'): yields['preselection']={}
-    if (not doCutTable) and (not getWhfCorrections):
+    if (not doCutTable) and (not getWhfCorrections) and (not doLimitSetting):
         for channel in doChannels:
-            plots+=[ChargedHiggsPlot(name='Nb',distribution='(jet_0_tag_ChargedHiggsCalc==1)+(jet_1_tag_ChargedHiggsCalc==1)+(jet_2_tag_ChargedHiggsCalc==1)+(jet_3_tag_ChargedHiggsCalc==1)+(jet_4_tag_ChargedHiggsCalc==1)+(jet_5_tag_ChargedHiggsCalc==1)+(jet_6_tag_ChargedHiggsCalc==1)+(jet_7_tag_ChargedHiggsCalc==1)+(jet_8_tag_ChargedHiggsCalc==1)+(jet_9_tag_ChargedHiggsCalc==1)',nBins=7,xMin=-0.5,xMax=6.5,xTitle='N_{b-jets}',yLog=True,cuts='preselection',channel=channel)]
+            plots+=[ChargedHiggsPlot(name='Nb',distribution='(jet_0_tag_ChargedHiggsCalc==1)+(jet_1_tag_ChargedHiggsCalc==1)+(jet_2_tag_ChargedHiggsCalc==1)+(jet_3_tag_ChargedHiggsCalc==1)+(jet_4_tag_ChargedHiggsCalc==1)+(jet_5_tag_ChargedHiggsCalc==1)+(jet_6_tag_ChargedHiggsCalc==1)+(jet_7_tag_ChargedHiggsCalc==1)+(jet_8_tag_ChargedHiggsCalc==1)+(jet_9_tag_ChargedHiggsCalc==1)',nBins=7,xMin=-0.5,xMax=6.5,xTitle='N_{b-jets}',yLog=True,cuts='preselection',channel=channel),
+
+                    #for top pT reweighting
+                    ChargedHiggsPlot(name='TopPt_Best',distribution='BestTop_Pt_LjetsTopoCalcNew',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(best jet,W) [GeV]',yLog=True,cuts='2p',channel=channel,extraCuts='jet_2_pt_ChargedHiggsCalc>30 && jet_3_pt_ChargedHiggsCalc>30 && 400<BestJetJet2W_M_LjetsTopoCalcNew && BestJetJet2W_M_LjetsTopoCalcNew<750')
+                    ]
                         
                         
     for plot in plots:
-        yields[plot.cuts][plot.channel]=plot.Prepare()
+        y=plot.Prepare()
+        try: yields[plot.cuts][plot.channel]=y
+        except: pass
         plot.Draw()
 
     cWidth=15; nameWidth=30
