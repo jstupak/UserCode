@@ -1,0 +1,11 @@
+universe = vanilla
+Executable = DIRECTORY/PREFIX_JOBID.csh
+Requirements   =  OpSys == "LINUX" && (Arch =="INTEL" || Arch =="x86_64")
+Should_Transfer_Files = YES
+WhenToTransferOutput = ON_EXIT_OR_EVICT
+Output = DIRECTORY/PREFIX_JOBID.out
+Error = DIRECTORY/PREFIX_JOBID.err
+Log = DIRECTORY/PREFIX_JOBID.log
+Notification = Never
+Queue = 1
++UseSL5 = True

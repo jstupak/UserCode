@@ -1,0 +1,60 @@
+{
+  gROOT->ProcessLine(".L /uscms/home/jstupak/snowmass/standalone/CMSSW_5_3_6/src/Delphes-3.0.9/libDelphes.so");
+  gROOT->ProcessLine(".L /uscms/home/jstupak/snowmass/standalone/CMSSW_5_3_6/src/Delphes-3.0.9/twoHiggsDoublet.cpp+");
+  
+  vector<TString> inputs;
+  //inputs.push_back(TString("/eos/uscms/store/user/jstupak/snowmass/14TeV/Delphes-3.0.9/AZh_14TEV_tata_500_NoPileUp.root"));
+  inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_10089.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_63475.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_63519.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_63539.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_6364.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64002.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64101.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_644298078.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64518.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64614.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64690.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64920.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_64956.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_65210.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_65263.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_6537.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_654003644.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_65552.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66082.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66180.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66241.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66439.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66539.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66771.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_66849.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_677680863.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_694266409.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_6980.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_712353683.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7131.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7507.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7547.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_755822197.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_757161337.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7694.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7829.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7900.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_8231.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_832419311.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_854761553.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_8635.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_8865.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_9018.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_93106106.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_9347.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_93662892.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_9389.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_95961970.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_9630.root"));
+ inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_98103320.root"));
+
+
+  run(inputs);
+}
