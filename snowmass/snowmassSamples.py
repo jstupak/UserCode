@@ -114,7 +114,7 @@ for pileup in pileups:
             if background in line:
                 sigma=float(line.split('|')[3].strip())
 
-        theInputFileList=relBase+'/src/JohnStupak/snowmass/'+background+'_'+pileup+'PileUp_files.txt'
+        theInputFileList=relBase+'/src/JohnStupak/snowmass/ntuples/'+background+'_'+pileup+'PileUp_files.txt'
 
         if 'TT' in background: theType='top'
         elif 'PHOTON' in background: theType='bkgd'
@@ -140,7 +140,7 @@ for pileup in pileups:
                     sigma=float(line.split('|')[3].strip())
 
             theInput='/eos/uscms/store/user/jstupak/snowmass/14TeV/Delphes-3.0.9/'+theName+'.root'
-            theInputFileList=relBase+'/src/JohnStupak/snowmasss/ntuples/'+signal+'.txt'
+            theInputFileList=relBase+'/src/JohnStupak/snowmass/ntuples/'+theName+'.txt'
             f=open(theInputFileList,'w')
             f.write(theInput)
             f.close()

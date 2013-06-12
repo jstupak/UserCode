@@ -88,7 +88,7 @@ def submitJobs():
                                                              ['PREFIX',jobID],
                                                              ['JOBID',jobNo],
                                                              ['EXECUTABLE',rootScript],
-                                                             ['INPUTS',fileNamesBase+'.txt']
+                                                             ['INPUTS',fileNamesBase+'.txt'],
                                                              ['OUTPUT',sample.name+'_'+str(jobNo)+'.root']])
 
                 os.system('chmod u+x '+condorScriptFile)
