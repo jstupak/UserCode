@@ -1,12 +1,3 @@
-/* 
-    INTRUCTIONS (FROM THE DELPHES HOME DIRECTORY): 
-    ln -s external/fastjet
-    root
-    gSystem->Load("libDelphes");
-    .L twoHiggsDoublet.cpp+
-    run()
- */
-
 double electronPtMin=20;
 double electronEtaMax=2.5;
 

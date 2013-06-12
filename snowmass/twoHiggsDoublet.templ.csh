@@ -15,6 +15,6 @@ cmsenv
 
 cd -
 
-root -l -b -q EXECUTABLE
+root -l -b -q EXECUTABLE\(\"INPUTS\"\)
 
 mv twoHiggsDoublet.root OUTPUT

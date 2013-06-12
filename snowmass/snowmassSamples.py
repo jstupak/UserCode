@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 from ROOT import TChain, kRed, kBlue, kGreen, kBlack
+relBase = os.environ['CMSSW_BASE']
 
 class Sample:
 
@@ -109,11 +110,11 @@ for pileup in pileups:
     for background in backgrounds:
         theName=name=background+'_'+pileup+'PileUp'
 
-        for line in open('/uscms/home/jstupak/work/CMSSW_5_3_6/src/UserCode/JohnStupak/txt/crossSections.txt'):
+        for line in open(relBase+'/src/JohnStupak/snowmass/crossSections.txt'):
             if background in line:
                 sigma=float(line.split('|')[3].strip())
 
-        theInputFileList='/uscms/home/jstupak/work/CMSSW_5_3_6/src/UserCode/JohnStupak/txt/'+background+'_'+pileup+'PileUp_files.txt'
+        theInputFileList=relBase+'/src/JohnStupak/snowmass/'+background+'_'+pileup+'PileUp_files.txt'
 
         if 'TT' in background: theType='top'
         elif 'PHOTON' in background: theType='bkgd'
@@ -134,12 +135,12 @@ for pileup in pileups:
         for signal in signals:
             theName=signal+'_'+mass+'_'+pileup+'PileUp'
 
-            for line in open('/uscms/home/jstupak/work/CMSSW_5_3_6/src/UserCode/JohnStupak/txt/crossSections.txt'):
+            for line in open(relBase+'/src/JohnStupak/snowmass/crossSections.txt'):
                 if signal+'_'+mass in line:
                     sigma=float(line.split('|')[3].strip())
 
             theInput='/eos/uscms/store/user/jstupak/snowmass/14TeV/Delphes-3.0.9/'+theName+'.root'
-            theInputFileList='/uscms/home/jstupak/work/CMSSW_5_3_6/src/UserCode/JohnStupak/txt/'+signal+'.txt'
+            theInputFileList=relBase+'/src/JohnStupak/snowmasss/ntuples/'+signal+'.txt'
             f=open(theInputFileList,'w')
             f.write(theInput)
             f.close()

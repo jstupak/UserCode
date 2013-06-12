@@ -13,9 +13,9 @@ doSignal=True
 
 analysisOutputDir='/uscms_data/d1/jstupak/2hdm'
 
-rootScriptTempl=relBase+"/src/Delphes-3.0.9/runIt.templ.C"
-condorJobTempl=relBase+"/src/twoHiggsDoublet.templ.job"
-condorScriptTempl=relBase+"/src/twoHiggsDoublet.templ.csh"
+rootScriptTempl=relBase+"/src/JohnStupak/snowmass/runIt.templ.C"
+condorJobTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.job"
+condorScriptTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.csh"
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #Analysis config
@@ -79,7 +79,7 @@ def submitJobs():
                 condorJobFile=fileNamesBase+'.job'
                 condorScriptFile=fileNamesBase+'.csh'
 
-                multiSed(rootScriptTempl,rootScript,[['INPUTS',fileNamesBase+'.txt']])
+                #multiSed(rootScriptTempl,rootScript,[['INPUTS',fileNamesBase+'.txt']])
                 multiSed(condorJobTempl,condorJobFile,[['DIRECTORY',jobDir],
                                                        ['PREFIX',jobID],
                                                        ['JOBID',jobNo]])
@@ -88,8 +88,8 @@ def submitJobs():
                                                              ['PREFIX',jobID],
                                                              ['JOBID',jobNo],
                                                              ['EXECUTABLE',rootScript],
+                                                             ['INPUTS',fileNamesBase+'.txt']
                                                              ['OUTPUT',sample.name+'_'+str(jobNo)+'.root']])
-                                                             
 
                 os.system('chmod u+x '+condorScriptFile)
                 submitCommand='condor_submit '+condorJobFile
@@ -100,7 +100,7 @@ def submitJobs():
                 firstFile=lastFile+1
                 lastFile=firstFile+sample.filesPerJob-1
 
-    os.system('tar -czvf '+condorDir+'/backup.tar.gz --exclude="*.log" --exclude="*.root" --exclude="*.pdf" --exclude="*.eps" --exclude=".backup" '+relBase+'/src/*')
+    os.system('tar -czvf '+condorDir+'/backup.tar.gz --exclude="*.log" --exclude="*.root" --exclude="*.pdf" --exclude="*.eps" --exclude=".backup" '+relBase+'/src/JohnStupak/snowmass/*')
 
 ################################################################################################################################################
 
