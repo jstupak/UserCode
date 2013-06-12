@@ -13,7 +13,7 @@ doSignal=True
 
 analysisOutputDir='/uscms_data/d1/jstupak/2hdm'
 
-rootScriptTempl=relBase+"/src/JohnStupak/snowmass/runIt.templ.C"
+rootScript=relBase+"/src/JohnStupak/snowmass/runIt.batch.C"
 condorJobTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.job"
 condorScriptTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.csh"
 
@@ -75,11 +75,9 @@ def submitJobs():
                     fileList.write(file+'\n')
                 fileList.close()
 
-                rootScript=fileNamesBase+'.C'
                 condorJobFile=fileNamesBase+'.job'
                 condorScriptFile=fileNamesBase+'.csh'
 
-                #multiSed(rootScriptTempl,rootScript,[['INPUTS',fileNamesBase+'.txt']])
                 multiSed(condorJobTempl,condorJobFile,[['DIRECTORY',jobDir],
                                                        ['PREFIX',jobID],
                                                        ['JOBID',jobNo]])
@@ -87,7 +85,6 @@ def submitJobs():
                                                              ['DIRECTORY',jobDir],
                                                              ['PREFIX',jobID],
                                                              ['JOBID',jobNo],
-                                                             ['EXECUTABLE',rootScript],
                                                              ['INPUTS',fileNamesBase+'.txt'],
                                                              ['OUTPUT',sample.name+'_'+str(jobNo)+'.root']])
 

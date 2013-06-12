@@ -15,6 +15,7 @@ cmsenv
 
 cd -
 
-root -l -b -q EXECUTABLE\(\"INPUTS\"\)
+
+root -l -b -q ${CMSSW_BASE}/src/JohnStupak/snowmass/runItBatch.C\(\"INPUTS\"\)
 
 mv twoHiggsDoublet.root OUTPUT
