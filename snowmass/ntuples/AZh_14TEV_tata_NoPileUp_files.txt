@@ -1,1 +1,0 @@
-/eos/uscms/store/user/jstupak/snowmass/14TeV/Delphes-3.0.9/AZh_14TEV_tata_500_NoPileUp.root
