@@ -23,9 +23,14 @@ tableOutput='yields.txt'
 
 pileup='No'
 energy='14'
+doSignals=['HZZ']
+doSigmalMasses=[300,450,600]
 
 #doCuts=['nL1']
 
+doCuts=['Presel','LepTrig','LepTrig_nL4','LepTrig_nL4_nZ1p','LepTrig_nL4_nZ2']
+
+"""
 doCuts=['nL1','nL2','nL3','nL4p',
         'nB1','nB2','nB3','nB4p',
         'nT1','nT2p',
@@ -41,14 +46,14 @@ doCuts=['nL1','nL2','nL3','nL4p',
         'nL4p_nT1','nL4p_nT2p',
 
         'nV1','nV2p','nV1_nh1','nh2p']
-
+"""
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 doShapeComparison=True
 outputDir=inputDir+'/plots'
 
 #1/fb
-lumi=300
+lumi=300.
 
 signalMagFac=1
 
@@ -58,6 +63,18 @@ treeName='twoHiggsDoublet'
 
 if not os.path.isdir(outputDir): os.system("mkdir -p "+outputDir)
 output=TFile(outputDir+'/plots.root',"RECREATE")
+
+s=[]
+for sample in samples:
+    include=False
+    if sample.isBackground: include=True
+    if sample.isSignal:
+        for mass in doSigmalMasses:
+            if str(mass) in sample.name:
+                for signal in doSignals:
+                    if signal in sample.name: include=True
+    if include: s.append(sample)
+samples=s
 
 class TwoHiggsDoubletPlot:
 
@@ -83,24 +100,46 @@ class TwoHiggsDoubletPlot:
         result={}
 
         self.cuts='1'
-        if 'nL1' in self.cutsID: self.cuts+=' && nElectron+nMuon==1'
+
+        if 'nL1p' in self.cutsID: self.cuts+=' && nElectron+nMuon>=1'
+        elif 'nL1' in self.cutsID: self.cuts+=' && nElectron+nMuon==1'
+        if 'nL2p' in self.cutsID: self.cuts+=' && nElectron+nMuon>=2'
         elif 'nL2' in self.cutsID: self.cuts+=' && nElectron+nMuon==2'
+        if 'nL3p' in self.cutsID: self.cuts+=' && nElectron+nMuon>=3'
         elif 'nL3' in self.cutsID: self.cuts+=' && nElectron+nMuon==3'
-        elif 'nL4p' in self.cutsID: self.cuts+=' && nElectron+nMuon>=4'
-        
-        if 'nB1' in self.cutsID: self.cuts+=' && nBJet==1'
+        if 'nL4p' in self.cutsID: self.cuts+=' && nElectron+nMuon>=4'
+        elif 'nL4' in self.cutsID: self.cuts+=' && nElectron+nMuon==4'
+
+        if 'nB1p' in self.cutsID: self.cuts+=' && nBJet>=1'
+        elif 'nB1' in self.cutsID: self.cuts+=' && nBJet==1'
+        if 'nB2p' in self.cutsID: self.cuts+=' && nBJet>=2'
         elif 'nB2' in self.cutsID: self.cuts+=' && nBJet==2'
+        if 'nB3p' in self.cutsID: self.cuts+=' && nBJet>=3'
         elif 'nB3' in self.cutsID: self.cuts+=' && nBJet==3'
-        elif 'nB4p' in self.cutsID: self.cuts+=' && nBJet>=4'
+        if 'nB4p' in self.cutsID: self.cuts+=' && nBJet>=4'
+        elif 'nB4' in self.cutsID: self.cuts+=' && nBJet==4'
         
-        if 'nT1' in self.cutsID: self.cuts+=' && nTau==1'
-        elif 'nT2p' in self.cutsID: self.cuts+=' && nTau>=2'
+        if 'nT1p' in self.cutsID: self.cuts+=' && nTau>=1'
+        elif 'nT1' in self.cutsID: self.cuts+=' && nTau==1'
+        if 'nT2p' in self.cutsID: self.cuts+=' && nTau>=2'
+        elif 'nT2' in self.cutsID: self.cuts+=' && nTau==2'
 
-        if 'nV1' in self.cutsID: self.cuts+=' && nW+nZ==1'
-        elif 'nV2p' in self.cutsID: self.cuts+=' && nW+nZ>=2'
+        if 'nV1p' in self.cutsID: self.cuts+=' && nW+nZ>=1'
+        elif 'nV1' in self.cutsID: self.cuts+=' && nW+nZ==1'
+        if 'nV2p' in self.cutsID: self.cuts+=' && nW+nZ>=2'
+        elif 'nV2' in self.cutsID: self.cuts+=' && nW+nZ==2'
 
-        if 'nh1' in self.cutsID: self.cuts+=' && nh==1'
+        if 'nZ1p' in self.cutsID: self.cuts+=' && nZ>=1'
+        elif 'nZ1' in self.cutsID: self.cuts+=' && nZ==1'
+        if 'nZ2p' in self.cutsID: self.cuts+=' && nZ>=2'
+        elif 'nZ2' in self.cutsID: self.cuts+=' && nZ==2'
+        
+        if 'nh1p' in self.cutsID: self.cuts+=' && nh>=1'
+        elif 'nh1' in self.cutsID: self.cuts+=' && nh==1'
         if 'nh2p' in self.cutsID: self.cuts+=' && nh>=2'
+        elif 'nh2' in self.cutsID: self.cuts+=' && nh==2'
+        
+        if 'LepTrig' in self.cutsID: self.cuts+=' && ( passSingleLeptonTrigger==1 ||  passDiLeptonTrigger==1 )'
         
         global samples
         goodSamples=[]
@@ -115,14 +154,17 @@ class TwoHiggsDoubletPlot:
             sample.file=TFile(inputDir+'/'+sample.name+'.root')
             sample.tree=sample.file.Get(treeName)
             sample.nEvents=sample.tree.GetEntriesFast()
-            #print sample.name,sample.nEvents
             hName=self.name+'__'+sample.name
             sample.h=TH1F(hName,";"+self.xTitle,self.nBins,self.bins)
 
-            weight='1'
+            weight='eventWeight'
             nSelectedRaw=sample.tree.Draw(self.distribution+">>"+hName,weight+'*('+self.cuts+')','E GOFF')
+
+            if not sample.crossSection:
+                sample.setCrossSection(beta=0.7853981633974483, cosBetaMinusAlpha=-.5, twoHDMType=2)
+
+            #print sample.crossSection
             if sample.h.Integral(0,self.nBins+1)!=0: sample.h.Scale(1000*lumi*sample.crossSection/sample.nEvents)
-            #print sample.name, nSelectedRaw, sample.h.Integral(0,self.nBins+1)
             result[sample.name]=sample.h.Integral(0,self.nBins+1) #for cutflow table
             
         #format histograms and draw plots
@@ -143,7 +185,9 @@ class TwoHiggsDoubletPlot:
                 sample.h.SetLineColor(kBlack)
                 sample.h.SetLineStyle(2+len(self.signals))
                 self.signals.append(sample)
-            elif sample.type=='top': self.top.Add(sample.h)
+            elif sample.type=='top':
+                self.top.Add(sample.h)
+                print sample.name
             elif sample.type=='ewk': self.ewk.Add(sample.h)
             elif sample.isBackground: self.other.Add(sample.h)
             sample.h.SetLineWidth(2)
@@ -319,33 +363,52 @@ if __name__=='__main__':
         if onlyDoCutTable:
             plots+=[TwoHiggsDoubletPlot(name='dummy',distribution='MET',nBins=1,xMin=0,xMax=9e9,cutsID=cuts)]
         else:        
-            plots+=[TwoHiggsDoubletPlot(name='MET',distribution='MET',nBins=250,xMin=0,xMax=1000,xTitle='MET [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='ST',distribution='ST',nBins=250,xMin=0,xMax=2500,xTitle='S_{T} [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='HT',distribution='HT',nBins=250,xMin=0,xMax=2000,xTitle='H_{T} [GeV]',yLog=True,cutsID=cuts),
+            plots+=[#TwoHiggsDoubletPlot(name='MET',distribution='MET',nBins=25,xMin=0,xMax=500,xTitle='MET [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='ST',distribution='ST',nBins=100,xMin=0,xMax=2000,xTitle='S_{T} [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='HT',distribution='HT',nBins=60,xMin=0,xMax=1200,xTitle='H_{T} [GeV]',yLog=True,cutsID=cuts),
 
-                    TwoHiggsDoubletPlot(name='electron1_pT',distribution='electron1_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(electron_{1}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='muon1_pT',distribution='muon1_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(muon_{1}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='tau1_pT',distribution='tau1_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(tau_{1}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='bJet1_pT',distribution='bJet1_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(b-jet_{1}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='jet1_pT',distribution='jet1_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='tau1_pT',distribution='tau1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(tau_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='bJet1_pT',distribution='bJet1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(b-jet_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='jet1_pT',distribution='jet1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(jet_{1}) [GeV]',yLog=True,cutsID=cuts),
 
-                    TwoHiggsDoubletPlot(name='electron2_pT',distribution='electron2_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(electron_{2}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='muon2_pT',distribution='muon2_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(muon_{2}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='tau2_pT',distribution='tau2_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(tau_{2}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='bJet2_pT',distribution='bJet2_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(b-jet_{2}) [GeV]',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='jet2_pT',distribution='jet2_pT',nBins=150,xMin=0,xMax=1500,xTitle='p_{T}(jet_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='tau2_pT',distribution='tau2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(tau_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='bJet2_pT',distribution='bJet2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(b-jet_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='jet2_pT',distribution='jet2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(jet_{2}) [GeV]',yLog=True,cutsID=cuts),
+
+                    #TwoHiggsDoubletPlot(name='electron1_pT',distribution='electron1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(electron_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='electron2_pT',distribution='electron2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(electron_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='electron3_pT',distribution='electron3_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(electron_{3}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='electron4_pT',distribution='electron4_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(electron_{4}) [GeV]',yLog=True,cutsID=cuts),
                     
+                    #TwoHiggsDoubletPlot(name='muon1_pT',distribution='muon1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(muon_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='muon2_pT',distribution='muon2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(muon_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='muon3_pT',distribution='muon3_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(muon_{3}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='muon4_pT',distribution='muon4_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(muon_{4}) [GeV]',yLog=True,cutsID=cuts),
+                    
+                    TwoHiggsDoubletPlot(name='lepton1_pT',distribution='lepton1_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(lepton_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='lepton2_pT',distribution='lepton2_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(lepton_{2}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='lepton3_pT',distribution='lepton3_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(lepton_{3}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='lepton4_pT',distribution='lepton4_pT',nBins=40,xMin=0,xMax=400,xTitle='p_{T}(lepton_{4}) [GeV]',yLog=True,cutsID=cuts),
+
                     TwoHiggsDoubletPlot(name='nElectron',distribution='nElectron',nBins=8,xMin=-.5,xMax=7.5,xTitle='electron multiplicity',yLog=True,cutsID=cuts),
                     TwoHiggsDoubletPlot(name='nMuon',distribution='nMuon',nBins=8,xMin=-.5,xMax=7.5,xTitle='muon multiplicity',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='nTau',distribution='nTau',nBins=8,xMin=-.5,xMax=7.5,xTitle='tau multiplicity',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='nBJet',distribution='nBJet',nBins=8,xMin=-.5,xMax=7.5,xTitle='b-jet multiplicity',yLog=True,cutsID=cuts),
-                    TwoHiggsDoubletPlot(name='nJet',distribution='nJet',nBins=16,xMin=-.5,xMax=15.5,xTitle='jet multiplicity',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='nLepton',distribution='nElectron+nMuon',nBins=8,xMin=-.5,xMax=7.5,xTitle='lepton multiplicity',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='nZ',distribution='nZ',nBins=8,xMin=-.5,xMax=7.5,xTitle='Z boson multiplicity',yLog=True,cutsID=cuts),
+                    
+                    #TwoHiggsDoubletPlot(name='nTau',distribution='nTau',nBins=8,xMin=-.5,xMax=7.5,xTitle='tau multiplicity',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='nBJet',distribution='nBJet',nBins=8,xMin=-.5,xMax=7.5,xTitle='b-jet multiplicity',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='nJet',distribution='nJet',nBins=16,xMin=-.5,xMax=15.5,xTitle='jet multiplicity',yLog=True,cutsID=cuts),
 
-                    #TwoHiggsDoubletPlot(name='mZ1',distribution='Z1_mass',nBins=50,xMin=50,xMax=150,xTitle='m(Z) [GeV]',yLog=True,cutsID=cuts),
-                    #TwoHiggsDoubletPlot(name='mW1',distribution='W1_mass',nBins=50,xMin=50,xMax=150,xTitle='m(W) [GeV]',yLog=True,cutsID=cuts),
-                    #TwoHiggsDoubletPlot(name='mh1',distribution='h1_mass',nBins=50,xMin=75,xMax=150,xTitle='m(h) [GeV]',yLog=True,cutsID=cuts),
-                    #TwoHiggsDoubletPlot(name='mH1',distribution='H1_mass',nBins=50,xMin=300,xMax=700,xTitle='m(H) [GeV]',yLog=True,cutsID=cuts),
-                    #TwoHiggsDoubletPlot(name='mA1',distribution='A1_mass',nBins=50,xMin=300,xMax=700,xTitle='m(A) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='mW1',distribution='W1_mass',nBins=50,xMin=50,xMax=150,xTitle='m(W_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='mh1',distribution='h1_mass',nBins=50,xMin=75,xMax=150,xTitle='m(h_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='mH1',distribution='H1_mass',nBins=80,xMin=100,xMax=900,xTitle='m(H_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    #TwoHiggsDoubletPlot(name='mA1',distribution='A1_mass',nBins=50,xMin=300,xMax=700,xTitle='m(A_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    
+                    TwoHiggsDoubletPlot(name='mZ1',distribution='Z1_mass',nBins=50,xMin=50,xMax=150,xTitle='m(Z_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='mZ2',distribution='Z2_mass',nBins=50,xMin=50,xMax=150,xTitle='m(Z_{2}) [GeV]',yLog=True,cutsID=cuts),
+
+                    TwoHiggsDoubletPlot(name='Z1_pT',distribution='Z1_pT',nBins=75,xMin=0,xMax=750,xTitle='p_{T}(Z_{1}) [GeV]',yLog=True,cutsID=cuts),
+                    TwoHiggsDoubletPlot(name='Z2_pT',distribution='Z2_pT',nBins=75,xMin=0,xMax=750,xTitle='p_{T}(Z_{2}) [GeV]',yLog=True,cutsID=cuts),
                     ]
 
         for plot in plots:
@@ -361,19 +424,28 @@ if __name__=='__main__':
         if sample.isSignal: continue
         print sample.name.ljust(nameWidth),
         for cuts in doCuts:
-            print str(int(round(yields[cuts][sample.name]))).ljust(cWidth),
+            print str('%.3g'%yields[cuts][sample.name]).ljust(cWidth),
+        print
+    for sample in ['Total Background']:
+        print sample.ljust(nameWidth),
+        for cuts in doCuts:
+            print str('%.3g'%yields[cuts][sample]).ljust(cWidth),
         print
     for sample in samples:
         if not sample.isSignal: continue
         print sample.name.ljust(nameWidth),
         for cuts in doCuts:
-            print str(int(round(yields[cuts][sample.name]))).ljust(cWidth),
+            print str('%.3g'%yields[cuts][sample.name]).ljust(cWidth),
         print
-    for sample in ['Total Background','Total Signal']:
-        print sample.ljust(nameWidth),
+
+        print 'S/(sqrt(S+B)+(B*20%))'.ljust(nameWidth),
         for cuts in doCuts:
-            print str(int(round(yields[cuts][sample]))).ljust(cWidth),
+            try: val=yields[cuts][sample.name]/sqrt(yields[cuts][sample.name]+yields[cuts]['Total Background']+(.2*yields[cuts]['Total Background'])**2)
+            except: val=float('Inf')
+            print str('%.3g'%val).ljust(cWidth),
         print
+        
+    """    
     print 'S/B'.ljust(nameWidth),
     for cuts in doCuts:
         try: val=yields[cuts]['Total Signal']/yields[cuts]['Total Background']
@@ -392,8 +464,4 @@ if __name__=='__main__':
         except: val=float('Inf')
         print str('%.3g'%val).ljust(cWidth),
     print
-
-        #for cuts in doCuts:
-        #    print str(round(yields[cuts][channel]['Total Background']/yields[cuts][channel]['Data'],3)).ljust(cWidth),
-        #    print 3*'\n'
-        
+    """
