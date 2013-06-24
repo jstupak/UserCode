@@ -1,10 +1,12 @@
-double electronPtMin=20;
+bool verbose=false;
+
+double electronPtMin=5;
 double electronEtaMax=2.5;
 
-double muonPtMin=20;
-double muonEtaMax=2.1;
+double muonPtMin=5;
+double muonEtaMax=2.5;
 
-double tauPtMin=20;
+double tauPtMin=5;
 double tauEtaMax=2.5;
 
 double bJetPtMin=20;
@@ -16,8 +18,8 @@ double jetEtaMax=2.5;
 double photonPtMin=20;
 double photonEtaMax=2.5;
 
-double ZMassMin_emu=81.;
-double ZMassMax_emu=101.;
+double ZMassMin_emu=60.;
+double ZMassMax_emu=120.;
 double ZMassMin_tau=76.;
 double ZMassMax_tau=106.;
 
@@ -42,6 +44,10 @@ double HAMassMax=1200.;
 //Pruning parameters
 double zcut = 0.1;
 double Dcut_factor = 0.5;
+
+//Triggers
+double singleLeptonTrigger_pTMin=30.;
+double dileptonTrigger_pTMins[2]={20,10};
 
 //------------------------------------------------------------------------------
 
@@ -81,6 +87,9 @@ using namespace std;
 TFile* output=new TFile("twoHiggsDoublet.root","RECREATE");
 TTree* tree=new TTree("twoHiggsDoublet","");
 
+double eventWeight;
+TBranch* b_eventWeight=tree->Branch("eventWeight", &eventWeight,"eventWeight/D");
+
 //Electrons
 int nElectron;
 double electron1_pT,electron2_pT,electron3_pT,electron4_pT;
@@ -110,6 +119,23 @@ TBranch* b_muon1_eta=tree->Branch("muon1_eta", &muon1_eta,"muon1_eta/D");
 TBranch* b_muon2_eta=tree->Branch("muon2_eta", &muon2_eta,"muon2_eta/D");
 TBranch* b_muon3_eta=tree->Branch("muon3_eta", &muon3_eta,"muon3_eta/D");
 TBranch* b_muon4_eta=tree->Branch("muon4_eta", &muon4_eta,"muon4_eta/D");
+
+//Leptons
+int nLepton;
+double lepton1_pT,lepton2_pT,lepton3_pT,lepton4_pT;
+double lepton1_eta,lepton2_eta,lepton3_eta,lepton4_eta;
+
+TBranch* b_nLepton=tree->Branch("nLepton",&nLepton,"nLepton/I");
+TBranch* b_lepton1_pT=tree->Branch("lepton1_pT", &lepton1_pT,"lepton1_pT/D");
+TBranch* b_lepton2_pT=tree->Branch("lepton2_pT", &lepton2_pT,"lepton2_pT/D");
+TBranch* b_lepton3_pT=tree->Branch("lepton3_pT", &lepton3_pT,"lepton3_pT/D");
+TBranch* b_lepton4_pT=tree->Branch("lepton4_pT", &lepton4_pT,"lepton4_pT/D");
+TBranch* b_lepton1_eta=tree->Branch("lepton1_eta", &lepton1_eta,"lepton1_eta/D");
+TBranch* b_lepton2_eta=tree->Branch("lepton2_eta", &lepton2_eta,"lepton2_eta/D");
+TBranch* b_lepton3_eta=tree->Branch("lepton3_eta", &lepton3_eta,"lepton3_eta/D");
+TBranch* b_lepton4_eta=tree->Branch("lepton4_eta", &lepton4_eta,"lepton4_eta/D");
+
+
 
 //Taus
 int nTau;
@@ -183,6 +209,7 @@ int nZ;
 double Z1_pT,Z2_pT,Z3_pT,Z4_pT;
 double Z1_eta,Z2_eta,Z3_eta,Z4_eta;
 double Z1_mass,Z2_mass,Z3_mass,Z4_mass;
+double Z1_daughter1_pT,Z1_daughter2_pT,Z2_daughter1_pT,Z2_daughter2_pT,Z3_daughter1_pT,Z3_daughter2_pT,Z4_daughter1_pT,Z4_daughter2_pT;
 
 TBranch* b_nZ=tree->Branch("nZ",&nZ,"nZ/I");
 TBranch* b_Z1_pT=tree->Branch("Z1_pT", &Z1_pT,"Z1_pT/D");
@@ -197,6 +224,14 @@ TBranch* b_Z1_mass=tree->Branch("Z1_mass", &Z1_mass,"Z1_mass/D");
 TBranch* b_Z2_mass=tree->Branch("Z2_mass", &Z2_mass,"Z2_mass/D");
 TBranch* b_Z3_mass=tree->Branch("Z3_mass", &Z3_mass,"Z3_mass/D");
 TBranch* b_Z4_mass=tree->Branch("Z4_mass", &Z4_mass,"Z4_mass/D");
+TBranch* b_Z1_daughter1_pT=tree->Branch("Z1_daughter1_pT", &Z1_daughter1_pT,"Z1_daughter1_pT/D");
+TBranch* b_Z1_daughter2_pT=tree->Branch("Z1_daughter2_pT", &Z1_daughter2_pT,"Z1_daughter2_pT/D");
+TBranch* b_Z2_daughter1_pT=tree->Branch("Z2_daughter1_pT", &Z2_daughter1_pT,"Z2_daughter1_pT/D");
+TBranch* b_Z2_daughter2_pT=tree->Branch("Z2_daughter2_pT", &Z2_daughter2_pT,"Z2_daughter2_pT/D");
+TBranch* b_Z3_daughter1_pT=tree->Branch("Z3_daughter1_pT", &Z3_daughter1_pT,"Z3_daughter1_pT/D");
+TBranch* b_Z3_daughter2_pT=tree->Branch("Z3_daughter2_pT", &Z3_daughter2_pT,"Z3_daughter2_pT/D");
+TBranch* b_Z4_daughter1_pT=tree->Branch("Z4_daughter1_pT", &Z4_daughter1_pT,"Z4_daughter1_pT/D");
+TBranch* b_Z4_daughter2_pT=tree->Branch("Z4_daughter2_pT", &Z4_daughter2_pT,"Z4_daughter2_pT/D");
 
 //Ws
 int nW;
@@ -283,12 +318,73 @@ TBranch* b_MET=tree->Branch("MET",&MET,"MET/D");
 TBranch* b_ST=tree->Branch("ST",&ST,"ST/D");
 TBranch* b_HT=tree->Branch("HT",&HT,"HT/D");
 
+int passSingleLeptonTrigger,passDiLeptonTrigger;
+TBranch* b_passSingleLeptonTrigger=tree->Branch("passSingleLeptonTrigger",&passSingleLeptonTrigger,"passSingleLeptonTrigger/I");
+TBranch* b_passDiLeptonTrigger=tree->Branch("passDiLeptonTrigger",&passDiLeptonTrigger,"passDiLeptonTrigger/I");
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-vector<TLorentzVector> getMothers(vector<TLorentzVector> &daughters, double minMass, double maxMass){
-  vector<TLorentzVector> result;
+class Particle{
+public:
+ 
+  Particle(): P4(0),daughters(0),mother(0),charge(0) {};
+  Particle(TLorentzVector* tlv): daughters(0),mother(0),charge(0) {
+    P4=(TLorentzVector*)tlv->Clone();
+  };
+  Particle(TLorentzVector tlv): daughters(0),mother(0),charge(0) {
+    P4=new TLorentzVector(tlv);
+  };
+  Particle(TLorentzVector* tlv, int q): daughters(0),mother(0),charge(q) {
+    P4=(TLorentzVector*)tlv->Clone();
+  };
+  Particle(TLorentzVector tlv,int q): daughters(0),mother(0),charge(q) {
+    P4=new TLorentzVector(tlv);
+  };
 
-  TLorentzVector daughter1, daughter2, motherCand;
+
+  TLorentzVector* P4;
+
+  std::vector<Particle*> daughters;
+  Particle* mother;
+  
+  int charge;
+};
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+bool closerToZMass(Particle part1, Particle part2){
+  double ZMass=91.1876;
+
+  return ( fabs(part1.P4->M()-ZMass) <= fabs(part2.P4->M()-ZMass) );
+}
+
+//==============================================================================
+
+bool largerPt(Particle part1, Particle part2){
+  return ( part1.P4->Pt() >= part2.P4->Pt() );
+}
+
+//==============================================================================
+
+bool smallerPt(Particle part1, Particle part2){
+  return ( part1.P4->Pt() < part2.P4->Pt() );
+}
+
+bool smallerPt_p(Particle* part1, Particle* part2){
+  return ( part1->P4->Pt() < part2->P4->Pt() );
+}
+
+//==============================================================================
+
+std::vector<Particle> getMothers(std::vector<Particle> &daughters, double minMass, double maxMass, bool OS=true){
+  if(verbose) cout<<"Inside getMothers"<<endl;
+  std::vector<Particle> result;
+
+  Particle daughter1, daughter2, motherCand;
   bool used[daughters.size()];  for(int daughterNo=0; daughterNo<daughters.size(); daughterNo++) used[daughterNo]=false;
 
   for(int daughter1No=0; daughter1No<daughters.size(); daughter1No++){
@@ -297,13 +393,19 @@ vector<TLorentzVector> getMothers(vector<TLorentzVector> &daughters, double minM
       for(int daughter2No=0; daughter2No<daughters.size(); daughter2No++){
         if(!used[daughter2No]){
           if(daughter1No!=daughter2No){
-            daughter2=daughters[daughter2No];
-
-            motherCand=daughter1+daughter2;
-            if(motherCand.M()>minMass && motherCand.M()<maxMass){
-              result.push_back(motherCand);
-              used[daughter1No]=true;
-              used[daughter2No]=true;
+	    if(!OS || daughter1.charge!=daughter2.charge){
+	      daughter2=daughters[daughter2No];
+	      
+	      if(verbose) cout<<"Messing with motherCand"<<endl;
+	      motherCand.P4=new TLorentzVector((*daughter1.P4)+(*daughter2.P4));
+	      if(motherCand.P4->M()>minMass && motherCand.P4->M()<maxMass){
+		motherCand.daughters.push_back(new Particle(daughter1.P4));
+		motherCand.daughters.push_back(new Particle(daughter2.P4));
+		std::sort(motherCand.daughters.begin(),motherCand.daughters.end(),smallerPt_p);
+		result.push_back(motherCand);
+		used[daughter1No]=true;
+		used[daughter2No]=true;
+	      }
             }
           }
         }
@@ -314,6 +416,7 @@ vector<TLorentzVector> getMothers(vector<TLorentzVector> &daughters, double minM
     if(used[daughterNo]) daughters.erase(daughters.begin()+daughterNo);
   }
 
+  if(verbose) cout<<"Leaving getMothers"<<endl;
   return result;
 }
 
@@ -328,6 +431,10 @@ void resetBranches(){
   nMuon=0;
   muon1_pT=-99; muon2_pT=-99; muon3_pT=-99; muon4_pT=-99;
   muon1_eta=-99; muon2_eta=-99; muon3_eta=-99; muon4_eta=-99;
+
+  nLepton=0;
+  lepton1_pT=-99; lepton2_pT=-99; lepton3_pT=-99; lepton4_pT=-99;
+  lepton1_eta=-99; lepton2_eta=-99; lepton3_eta=-99; lepton4_eta=-99;
 
   nTau=0;
   tau1_pT=-99; tau2_pT=-99; tau3_pT=-99; tau4_pT=-99;
@@ -373,270 +480,329 @@ void resetBranches(){
 
 //==============================================================================
 
-void fillElectronBranches(vector<TLorentzVector> electrons){
+void fillElectronBranches(std::vector<Particle> electrons){
+  if(verbose) cout<<"Filling Electron Branches"<<endl;
+  
   nElectron=electrons.size();
   if(nElectron>0){
-    electron1_pT=electrons[0].Pt();
-    electron1_eta=electrons[0].Eta();
+    electron1_pT=electrons[0].P4->Pt();
+    electron1_eta=electrons[0].P4->Eta();
   }
   if(nElectron>1){
-    electron2_pT=electrons[1].Pt();
-    electron2_eta=electrons[1].Eta();
+    electron2_pT=electrons[1].P4->Pt();
+    electron2_eta=electrons[1].P4->Eta();
   }
   if(nElectron>2){
-    electron3_pT=electrons[2].Pt();
-    electron3_eta=electrons[2].Eta();
+    electron3_pT=electrons[2].P4->Pt();
+    electron3_eta=electrons[2].P4->Eta();
   }
   if(nElectron>3){
-    electron4_pT=electrons[3].Pt();
-    electron4_eta=electrons[3].Eta();
+    electron4_pT=electrons[3].P4->Pt();
+    electron4_eta=electrons[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillMuonBranches(vector<TLorentzVector> muons){
+void fillMuonBranches(std::vector<Particle> muons){
+  if(verbose) cout<<"Filling Muon Branches"<<endl;
+
   nMuon=muons.size();
   if(nMuon>0){
-    muon1_pT=muons[0].Pt();
-    muon1_eta=muons[0].Eta();
+    muon1_pT=muons[0].P4->Pt();
+    muon1_eta=muons[0].P4->Eta();
   }
   if(nMuon>1){
-    muon2_pT=muons[1].Pt();
-    muon2_eta=muons[1].Eta();
+    muon2_pT=muons[1].P4->Pt();
+    muon2_eta=muons[1].P4->Eta();
   }
   if(nMuon>2){
-    muon3_pT=muons[2].Pt();
-    muon3_eta=muons[2].Eta();
+    muon3_pT=muons[2].P4->Pt();
+    muon3_eta=muons[2].P4->Eta();
   }
   if(nMuon>3){
-    muon4_pT=muons[3].Pt();
-    muon4_eta=muons[3].Eta();
+    muon4_pT=muons[3].P4->Pt();
+    muon4_eta=muons[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillTauBranches(vector<TLorentzVector> taus){
+void fillLeptonBranches(std::vector<Particle> leptons){
+  if(verbose) cout<<"Filling Lepton Branches"<<endl;
+
+  nLepton=leptons.size();
+  if(nLepton>0){
+    lepton1_pT=leptons[0].P4->Pt();
+    lepton1_eta=leptons[0].P4->Eta();
+  }
+  if(nLepton>1){
+    lepton2_pT=leptons[1].P4->Pt();
+    lepton2_eta=leptons[1].P4->Eta();
+  }
+  if(nLepton>2){
+    lepton3_pT=leptons[2].P4->Pt();
+    lepton3_eta=leptons[2].P4->Eta();
+  }
+  if(nLepton>3){
+    lepton4_pT=leptons[3].P4->Pt();
+    lepton4_eta=leptons[3].P4->Eta();
+  }
+}
+
+//==============================================================================
+
+void fillTauBranches(std::vector<Particle> taus){
+  if(verbose) cout<<"Filling Tau Branches"<<endl;
+
   nTau=taus.size();
   if(nTau>0){
-    tau1_pT=taus[0].Pt();
-    tau1_eta=taus[0].Eta();
+    tau1_pT=taus[0].P4->Pt();
+    tau1_eta=taus[0].P4->Eta();
   }
   if(nTau>1){
-    tau2_pT=taus[1].Pt();
-    tau2_eta=taus[1].Eta();
+    tau2_pT=taus[1].P4->Pt();
+    tau2_eta=taus[1].P4->Eta();
   }
   if(nTau>2){
-    tau3_pT=taus[2].Pt();
-    tau3_eta=taus[2].Eta();
+    tau3_pT=taus[2].P4->Pt();
+    tau3_eta=taus[2].P4->Eta();
   }
   if(nTau>3){
-    tau4_pT=taus[3].Pt();
-    tau4_eta=taus[3].Eta();
+    tau4_pT=taus[3].P4->Pt();
+    tau4_eta=taus[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillJetBranches(vector<TLorentzVector> jets){
+void fillJetBranches(std::vector<Particle> jets){
+  if(verbose) cout<<"Filling Jet Branches"<<endl;
+
   nJet=jets.size();
   if(nJet>0){
-    jet1_pT=jets[0].Pt();
-    jet1_eta=jets[0].Eta();
+    jet1_pT=jets[0].P4->Pt();
+    jet1_eta=jets[0].P4->Eta();
   }
   if(nJet>1){
-    jet2_pT=jets[1].Pt();
-    jet2_eta=jets[1].Eta();
+    jet2_pT=jets[1].P4->Pt();
+    jet2_eta=jets[1].P4->Eta();
   }
   if(nJet>2){
-    jet3_pT=jets[2].Pt();
-    jet3_eta=jets[2].Eta();
+    jet3_pT=jets[2].P4->Pt();
+    jet3_eta=jets[2].P4->Eta();
   }
   if(nJet>3){
-    jet4_pT=jets[3].Pt();
-    jet4_eta=jets[3].Eta();
+    jet4_pT=jets[3].P4->Pt();
+    jet4_eta=jets[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillBJetBranches(vector<TLorentzVector> bJets){
+void fillBJetBranches(std::vector<Particle> bJets){
+  if(verbose) cout<<"Filling B-Jet Branches"<<endl;
+
   nBJet=bJets.size();
   if(nBJet>0){
-    bJet1_pT=bJets[0].Pt();
-    bJet1_eta=bJets[0].Eta();
+    bJet1_pT=bJets[0].P4->Pt();
+    bJet1_eta=bJets[0].P4->Eta();
   }
   if(nBJet>1){
-    bJet2_pT=bJets[1].Pt();
-    bJet2_eta=bJets[1].Eta();
+    bJet2_pT=bJets[1].P4->Pt();
+    bJet2_eta=bJets[1].P4->Eta();
   }
   if(nBJet>2){
-    bJet3_pT=bJets[2].Pt();
-    bJet3_eta=bJets[2].Eta();
+    bJet3_pT=bJets[2].P4->Pt();
+    bJet3_eta=bJets[2].P4->Eta();
   }
   if(nBJet>3){
-    bJet4_pT=bJets[3].Pt();
-    bJet4_eta=bJets[3].Eta();
+    bJet4_pT=bJets[3].P4->Pt();
+    bJet4_eta=bJets[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillPhotonBranches(vector<TLorentzVector> photons){
+void fillPhotonBranches(std::vector<Particle> photons){
+  if(verbose) cout<<"Filling Photon Branches"<<endl;
+
   nPhoton=photons.size();
   if(nPhoton>0){
-    photon1_pT=photons[0].Pt();
-    photon1_eta=photons[0].Eta();
+    photon1_pT=photons[0].P4->Pt();
+    photon1_eta=photons[0].P4->Eta();
   }
   if(nPhoton>1){
-    photon2_pT=photons[1].Pt();
-    photon2_eta=photons[1].Eta();
+    photon2_pT=photons[1].P4->Pt();
+    photon2_eta=photons[1].P4->Eta();
   }
   if(nPhoton>2){
-    photon3_pT=photons[2].Pt();
-    photon3_eta=photons[2].Eta();
+    photon3_pT=photons[2].P4->Pt();
+    photon3_eta=photons[2].P4->Eta();
   }
   if(nPhoton>3){
-    photon4_pT=photons[3].Pt();
-    photon4_eta=photons[3].Eta();
+    photon4_pT=photons[3].P4->Pt();
+    photon4_eta=photons[3].P4->Eta();
   }
 }
 
 //==============================================================================
 
-void fillZBranches(vector<TLorentzVector> Zs){
+void fillZBranches(std::vector<Particle> Zs){
+  if(verbose) cout<<"Filling Z Branches"<<endl;
+
   nZ=Zs.size();
   if(nZ>0){
-    Z1_pT=Zs[0].Pt();
-    Z1_eta=Zs[0].Eta();
-    Z1_mass=Zs[0].M();
+    Z1_pT=Zs[0].P4->Pt();
+    Z1_eta=Zs[0].P4->Eta();
+    Z1_mass=Zs[0].P4->M();
+
+    Z1_daughter1_pT=Zs[0].daughters[0]->P4->Pt();
+    Z1_daughter2_pT=Zs[0].daughters[1]->P4->Pt();
   }
   if(nZ>1){
-    Z2_pT=Zs[1].Pt();
-    Z2_eta=Zs[1].Eta();
-    Z2_mass=Zs[1].M();
+    Z2_pT=Zs[1].P4->Pt();
+    Z2_eta=Zs[1].P4->Eta();
+    Z2_mass=Zs[1].P4->M();
+
+    Z2_daughter1_pT=Zs[1].daughters[0]->P4->Pt();
+    Z2_daughter2_pT=Zs[1].daughters[1]->P4->Pt();
   }
   if(nZ>2){
-    Z3_pT=Zs[2].Pt();
-    Z3_eta=Zs[2].Eta();
-    Z3_mass=Zs[2].M();
+    Z3_pT=Zs[2].P4->Pt();
+    Z3_eta=Zs[2].P4->Eta();
+    Z3_mass=Zs[2].P4->M();
+
+    Z3_daughter1_pT=Zs[2].daughters[0]->P4->Pt();
+    Z3_daughter2_pT=Zs[2].daughters[1]->P4->Pt();
   }
   if(nZ>3){
-    Z4_pT=Zs[3].Pt();
-    Z4_eta=Zs[3].Eta();
-    Z4_mass=Zs[3].M();
+    Z4_pT=Zs[3].P4->Pt();
+    Z4_eta=Zs[3].P4->Eta();
+    Z4_mass=Zs[3].P4->M();
+
+    Z4_daughter1_pT=Zs[3].daughters[0]->P4->Pt();
+    Z4_daughter2_pT=Zs[3].daughters[1]->P4->Pt();
   }
 }
 
 //==============================================================================
 
-void fillWBranches(vector<TLorentzVector> Ws){
+void fillWBranches(std::vector<Particle> Ws){
+  if(verbose) cout<<"Filling W Branches"<<endl;
+
   nW=Ws.size();
   if(nW>0){
-    W1_pT=Ws[0].Pt();
-    W1_eta=Ws[0].Eta();
-    W1_mass=Ws[0].M();
+    W1_pT=Ws[0].P4->Pt();
+    W1_eta=Ws[0].P4->Eta();
+    W1_mass=Ws[0].P4->M();
   }
   if(nW>1){
-    W2_pT=Ws[1].Pt();
-    W2_eta=Ws[1].Eta();
-    W2_mass=Ws[1].M();
+    W2_pT=Ws[1].P4->Pt();
+    W2_eta=Ws[1].P4->Eta();
+    W2_mass=Ws[1].P4->M();
   }
   if(nW>2){
-    W3_pT=Ws[2].Pt();
-    W3_eta=Ws[2].Eta();
-    W3_mass=Ws[2].M();
+    W3_pT=Ws[2].P4->Pt();
+    W3_eta=Ws[2].P4->Eta();
+    W3_mass=Ws[2].P4->M();
   }
   if(nW>3){
-    W4_pT=Ws[3].Pt();
-    W4_eta=Ws[3].Eta();
-    W4_mass=Ws[3].M();
+    W4_pT=Ws[3].P4->Pt();
+    W4_eta=Ws[3].P4->Eta();
+    W4_mass=Ws[3].P4->M();
   }
 }
 
 //==============================================================================
 
-void fillhBranches(vector<TLorentzVector> hs){
+void fillhBranches(std::vector<Particle> hs){
+  if(verbose) cout<<"Filling h Branches"<<endl;
+
   nh=hs.size();
   if(nh>0){
-    h1_pT=hs[0].Pt();
-    h1_eta=hs[0].Eta();
-    h1_mass=hs[0].M();
+    h1_pT=hs[0].P4->Pt();
+    h1_eta=hs[0].P4->Eta();
+    h1_mass=hs[0].P4->M();
   }
   if(nh>1){
-    h2_pT=hs[1].Pt();
-    h2_eta=hs[1].Eta();
-    h2_mass=hs[1].M();
+    h2_pT=hs[1].P4->Pt();
+    h2_eta=hs[1].P4->Eta();
+    h2_mass=hs[1].P4->M();
   }
   if(nh>2){
-    h3_pT=hs[2].Pt();
-    h3_eta=hs[2].Eta();
-    h3_mass=hs[2].M();
+    h3_pT=hs[2].P4->Pt();
+    h3_eta=hs[2].P4->Eta();
+    h3_mass=hs[2].P4->M();
   }
   if(nh>3){
-    h4_pT=hs[3].Pt();
-    h4_eta=hs[3].Eta();
-    h4_mass=hs[3].M();
+    h4_pT=hs[3].P4->Pt();
+    h4_eta=hs[3].P4->Eta();
+    h4_mass=hs[3].P4->M();
   }
 }
 
 //==============================================================================
 
-void fillHBranches(vector<TLorentzVector> Hs){
+void fillHBranches(std::vector<Particle> Hs){
+  if(verbose) cout<<"Filling H Branches"<<endl;
+
   nH=Hs.size();
   if(nH>0){
-    H1_pT=Hs[0].Pt();
-    H1_eta=Hs[0].Eta();
-    H1_mass=Hs[0].M();
+    H1_pT=Hs[0].P4->Pt();
+    H1_eta=Hs[0].P4->Eta();
+    H1_mass=Hs[0].P4->M();
   }
   if(nH>1){
-    H2_pT=Hs[1].Pt();
-    H2_eta=Hs[1].Eta();
-    H2_mass=Hs[1].M();
+    H2_pT=Hs[1].P4->Pt();
+    H2_eta=Hs[1].P4->Eta();
+    H2_mass=Hs[1].P4->M();
   }
   if(nH>2){
-    H3_pT=Hs[2].Pt();
-    H3_eta=Hs[2].Eta();
-    H3_mass=Hs[2].M();
+    H3_pT=Hs[2].P4->Pt();
+    H3_eta=Hs[2].P4->Eta();
+    H3_mass=Hs[2].P4->M();
   }
   if(nH>3){
-    H4_pT=Hs[3].Pt();
-    H4_eta=Hs[3].Eta();
-    H4_mass=Hs[3].M();
+    H4_pT=Hs[3].P4->Pt();
+    H4_eta=Hs[3].P4->Eta();
+    H4_mass=Hs[3].P4->M();
   }
 }
 
 //==============================================================================
 
-void fillABranches(vector<TLorentzVector> As){
-  nA=As.size();
+void fillABranches(std::vector<Particle> As){
+  if(verbose) cout<<"Filling A Branches"<<endl;
+  
+nA=As.size();
   if(nA>0){
-    A1_pT=As[0].Pt();
-    A1_eta=As[0].Eta();
-    A1_mass=As[0].M();
+    A1_pT=As[0].P4->Pt();
+    A1_eta=As[0].P4->Eta();
+    A1_mass=As[0].P4->M();
   }
   if(nA>1){
-    A2_pT=As[1].Pt();
-    A2_eta=As[1].Eta();
-    A2_mass=As[1].M();
+    A2_pT=As[1].P4->Pt();
+    A2_eta=As[1].P4->Eta();
+    A2_mass=As[1].P4->M();
   }
   if(nA>2){
-    A3_pT=As[2].Pt();
-    A3_eta=As[2].Eta();
-    A3_mass=As[2].M();
+    A3_pT=As[2].P4->Pt();
+    A3_eta=As[2].P4->Eta();
+    A3_mass=As[2].P4->M();
   }
   if(nA>3){
-    A4_pT=As[3].Pt();
-    A4_eta=As[3].Eta();
-    A4_mass=As[3].M();
+    A4_pT=As[3].P4->Pt();
+    A4_eta=As[3].P4->Eta();
+    A4_mass=As[3].P4->M();
   }
 }
 
 //==============================================================================
 
-void run(vector<TString> inputs){
-
+void run(std::vector<TString> inputs){
+  if(verbose) cout<<"Starting Analysis"<<endl;
+  
   //Input
   TChain *chain = new TChain("Delphes");
   for(int lp=0; lp<inputs.size(); lp++) chain->Add(inputs[lp]);
@@ -645,6 +811,7 @@ void run(vector<TString> inputs){
   Long64_t allEntries = treeReader->GetEntries();
   cout << "** Chain contains " << allEntries << " events" << endl;
 
+  TClonesArray *branchEvent = treeReader->UseBranch("Event");
   TClonesArray *branchParticle = treeReader->UseBranch("Particle");
 
   TClonesArray *branchElectron = treeReader->UseBranch("Electron");
@@ -665,35 +832,58 @@ void run(vector<TString> inputs){
     treeReader->ReadEntry(eventNo);
     resetBranches();
 
-    vector<TLorentzVector> allObjects,leptons;
+    LHEFEvent* event=(LHEFEvent*)branchEvent->At(0);
+    eventWeight=event->Weight;
 
-    vector<TLorentzVector> electrons;
+    passSingleLeptonTrigger=0;
+    passDiLeptonTrigger=0;
+
+    std::vector<Particle> allObjects,leptons;
+
+    if(verbose) cout<<"Starting Electron Selection"<<endl;
+    std::vector<Particle> electrons;
     Electron *electron;
     for(int electronNo=0; electronNo<branchElectron->GetEntriesFast(); electronNo++){
       electron=(Electron*)branchElectron->At(electronNo);
       
       if(electron->PT > electronPtMin && fabs(electron->Eta)<electronEtaMax){
-	allObjects.push_back(electron->P4());
-	electrons.push_back(electron->P4());
-	leptons.push_back(electron->P4());
+	Particle e(electron->P4(),electron->Charge);
+	allObjects.push_back(e);
+	electrons.push_back(e);
+	leptons.push_back(e);
       }
     }
+    std::sort(electrons.begin(),electrons.end(),largerPt);
     fillElectronBranches(electrons);
 
-    vector<TLorentzVector> muons;
+    if(verbose) cout<<"Starting Muon Selection"<<endl;
+    std::vector<Particle> muons;
     Muon *muon;
     for(int muonNo=0; muonNo<branchMuon->GetEntriesFast(); muonNo++){
       muon=(Muon*)branchMuon->At(muonNo);
 
       if(muon->PT > muonPtMin && fabs(muon->Eta)<muonEtaMax){
-	allObjects.push_back(muon->P4());
-	muons.push_back(muon->P4());
-	leptons.push_back(muon->P4());
+	Particle mu(muon->P4(),muon->Charge);
+	allObjects.push_back(mu);
+	muons.push_back(mu);
+	leptons.push_back(mu);
       }
     }
+    std::sort(muons.begin(),muons.end(),largerPt);
     fillMuonBranches(muons);
 
-    vector<TLorentzVector> bJets,taus,jets;
+    if(verbose) cout<<"Sorting Leptons"<<endl;
+    std::sort(leptons.begin(),leptons.end(),largerPt); 
+    fillLeptonBranches(leptons);
+    if(leptons.size()>0){
+      if(leptons[0].P4->Pt() > singleLeptonTrigger_pTMin) passSingleLeptonTrigger=1;
+      if(leptons.size()>1){
+	if(leptons[0].P4->Pt() > dileptonTrigger_pTMins[0] && leptons[1].P4->Pt() > dileptonTrigger_pTMins[1]) passDiLeptonTrigger=1;
+      }
+    }
+
+    if(verbose) cout<<"Starting Jet, B-jet, and Tau Selection"<<endl;
+    std::vector<Particle> bJets,taus,jets;
     Jet *jet;
     for(int jetNo=0; jetNo<branchJet->GetEntriesFast(); jetNo++){
       jet=(Jet*)branchJet->At(jetNo);
@@ -734,7 +924,8 @@ void run(vector<TString> inputs){
       }
     }
 
-    vector<TLorentzVector> photons;
+    if(verbose) cout<<"Starting Photon Selection"<<endl;
+    std::vector<Particle> photons;
     Photon *photon;
     for(int photonNo=0; photonNo<branchPhoton->GetEntriesFast(); photonNo++){
       photon=(Photon*)branchPhoton->At(photonNo);
@@ -748,54 +939,61 @@ void run(vector<TString> inputs){
 
     //------------------------------------------------------------------------------
     //Object reconstruction
+    if(verbose) cout<<"Starting Object Reconstruction"<<endl;
 
     double METx=0;
     double METy=0;
     for(int objectNo=0; objectNo<allObjects.size(); objectNo++){
-      METx+=allObjects[objectNo].Px();
-      METy+=allObjects[objectNo].Py();
+      METx+=allObjects[objectNo].P4->Px();
+      METy+=allObjects[objectNo].P4->Py();
     }
     MET=sqrt(METx*METx+METy*METy);
 
     ST=0;
     for(int objectNo=0; objectNo<allObjects.size(); objectNo++){
-      ST+=allObjects[objectNo].Pt();
+      ST+=allObjects[objectNo].P4->Pt();
     }
 
     HT=0;
     for(int jetNo=0; jetNo<jets.size(); jetNo++)
-      HT+=jets[jetNo].Pt();
+      HT+=jets[jetNo].P4->Pt();
 
-    vector<TLorentzVector> Ws, Zs, hs, Hs, As;
+    std::vector<Particle> Ws, Zs, hs, Hs, As;
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     //Leptonic Zs
-    
-    Zs=getMothers(electrons,ZMassMin_emu,ZMassMax_emu);
+    if(verbose) cout<<"Starting Leptonic Z Reconstruction"<<endl;
 
-    vector<TLorentzVector> moreZs;
-    moreZs=getMothers(muons,ZMassMin_emu,ZMassMax_emu);
+    Zs=getMothers(electrons,ZMassMin_emu,ZMassMax_emu,true);
+
+    std::vector<Particle> moreZs;
+    moreZs=getMothers(muons,ZMassMin_emu,ZMassMax_emu,true);
     Zs.insert(Zs.end(), moreZs.begin(), moreZs.end());
 
-    moreZs=getMothers(taus,ZMassMin_tau,ZMassMax_tau);
-    Zs.insert(Zs.end(), moreZs.begin(),moreZs.end());
+    //moreZs=getMothers(taus,ZMassMin_tau,ZMassMax_tau);
+    //Zs.insert(Zs.end(), moreZs.begin(),moreZs.end());
+
+    std::sort(Zs.begin(),Zs.end(),closerToZMass);
 
     fillZBranches(Zs);
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //Hadronic Ws: Adapted from recipe by Jim Dolen
+    /*
+    if(verbose) cout<<"Starting Hadronic W Reconstruction"<<endl;
 
     GenParticle *particle;
     Track *track;
     Tower *tower;
 
     TObject *constituent;
-    TLorentzVector momentum, W;
+    TLorentzVector momentum;
+    Particle W;
     for(int jetNo=0; jetNo<branchCAJet->GetEntriesFast(); jetNo++){
       jet=(Jet*) branchCAJet->At(jetNo);
       if (jet->PT<250) continue; 
 
-      vector<fastjet::PseudoJet> input_particles;
+      std::vector<fastjet::PseudoJet> input_particles;
       for(int constituentNo=0; constituentNo<jet->Constituents.GetEntriesFast(); constituentNo++){
 	constituent=jet->Constituents.At(constituentNo);
         if(constituent!=0){
@@ -812,36 +1010,43 @@ void run(vector<TString> inputs){
         }
       }//end constituent loop
       //Recluster jet
+      if(verbose) cout<<"Reclustering Jet"<<endl;
+
       double R=0.8;
       fastjet::JetDefinition jet_def(fastjet::cambridge_algorithm, R);
       fastjet::ClusterSequence cs(input_particles, jet_def);
-      vector<fastjet::PseudoJet> jets=sorted_by_pt(cs.inclusive_jets());
+      std::vector<fastjet::PseudoJet> pJets=sorted_by_pt(cs.inclusive_jets());
 
+      if(verbose) cout<<"Pruning Jet"<<endl;
       //Pruning 
       Pruner pruner(cambridge_algorithm, zcut, Dcut_factor);
-      PseudoJet prunedJet=pruner(jets[0]);
+      PseudoJet prunedJet=pruner(pJets[0]);
 
-      vector<PseudoJet> prunedSubjets=sorted_by_pt(prunedJet.exclusive_subjets_up_to(2));
+      if(verbose) cout<<"W-tagging"<<endl;
+      std::vector<PseudoJet> prunedSubjets=sorted_by_pt(prunedJet.exclusive_subjets_up_to(2));
       double mu=10000;
       if(prunedSubjets.size()>1){
         if(prunedSubjets[0].m() >  prunedSubjets[1].m()) mu=prunedSubjets[0].m()/prunedJet.m();
         else mu=prunedSubjets[1].m()/prunedJet.m();
 	
 	if(mu<muMax && prunedJet.m()>hadronicWMassMin && prunedJet.m()<hadronicWMassMax){
-	  W.SetPxPyPzE(prunedJet.px(), prunedJet.py(), prunedJet.pz(), prunedJet.E());
+	  W.P4->SetPxPyPzE(prunedJet.px(), prunedJet.py(), prunedJet.pz(), prunedJet.E());
 	  Ws.push_back(W);
 	}     
       }
     }//end jet loop  
 
     fillWBranches(Ws);
+    */
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //h -> bb, tautau, VV, gammagamma
+    /*
+    if(verbose) cout<<"Starting h Reconstruction"<<endl;
 
     hs=getMothers(bJets,higgsMassMin_b,higgsMassMax_b);
 
-    vector<TLorentzVector> morehs;
+    std::vector<Particle> morehs;
     morehs=getMothers(taus,higgsMassMin_tau,higgsMassMax_tau);
     hs.insert(hs.end(), morehs.begin(), morehs.end());
 
@@ -855,13 +1060,15 @@ void run(vector<TString> inputs){
     hs.insert(hs.end(), morehs.begin(), morehs.end());
 
     fillhBranches(hs);
-
+    */
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //H -> bb, tautau, VV, gammagamma, hh
-
+    if(verbose) cout<<"Starting H Reconstruction"<<endl;
+    
+    /*
     Hs=getMothers(bJets,HAMassMin,HAMassMax);
 
-    vector<TLorentzVector> moreHs;
+    std::vector<Particle> moreHs;
     moreHs=getMothers(taus,HAMassMin,HAMassMax);
     Hs.insert(Hs.end(), moreHs.begin(), moreHs.end());
 
@@ -876,24 +1083,27 @@ void run(vector<TString> inputs){
 
     moreHs=getMothers(hs,HAMassMin,HAMassMax);
     Hs.insert(Hs.end(), moreHs.begin(), moreHs.end());
+    */
 
+    Hs=getMothers(Zs,0,9999999,false);
     fillHBranches(Hs);
-
+    
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //A -> bb, tautau, gammagamma, Zh 
+    if(verbose) cout<<"Starting A Reconstruction"<<endl;
 
-    TLorentzVector Z, h;
+    Particle Z, h;
 
     As=getMothers(bJets,HAMassMin,HAMassMax);
 
-    vector<TLorentzVector> moreAs;
+    std::vector<Particle> moreAs;
     moreAs=getMothers(taus,HAMassMin,HAMassMax);
     As.insert(As.end(), moreAs.begin(), moreAs.end());
 
     moreAs=getMothers(photons,HAMassMin,HAMassMax);
     As.insert(As.end(), moreAs.begin(), moreAs.end());
 
-    TLorentzVector ACand;
+    Particle ACand;
     bool usedZ[Zs.size()], usedh[hs.size()];  
     for(int ZNo=0; ZNo<Zs.size(); ZNo++) usedZ[ZNo]=false;
     for(int hNo=0; hNo<hs.size(); hNo++) usedh[hNo]=false;
@@ -905,8 +1115,8 @@ void run(vector<TString> inputs){
 	  if(!usedh[hNo]){
 	    h=hs[hNo];
 
-	    ACand=Z+h;
-	    if(ACand.M()>HAMassMin && ACand.M()<HAMassMax){
+	    *(ACand.P4)=(*Z.P4)+(*h.P4);
+	    if(ACand.P4->M()>HAMassMin && ACand.P4->M()<HAMassMax){
 	      As.push_back(ACand);
 	      usedZ[ZNo]=true;
 	      usedh[hNo]=true;
