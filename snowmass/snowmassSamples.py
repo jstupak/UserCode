@@ -92,7 +92,7 @@ class Sample:
                     B=float(line.split()[1])
                     if abs((beta-B)/beta)<.0001 and abs((cosBetaMinusAlpha-cBMA)/cosBetaMinusAlpha)<.000001:
                         br=float(line.split()[2])
-                        if finalState=='ZZ' and 'fullyLeptonic' in self.name: br*=.03363738
+                        if finalState=='ZZ' and '4l' in self.name: br*=((2*.03363738)**2)
 
                         self.crossSection*=br
                         break
@@ -224,7 +224,7 @@ for pileup in pileups:
         for signal in signals:
             theName=signal+'_'+mass+'_'+pileup+'PileUp'
 
-            inputFiles=glob('/uscms_data/d3/jstupak/delphes/output/'+signal+'_'+mass+'*'+pileup+'*root')
+            inputFiles=glob('/eos/uscms/store/user/jstupak/snowmass/Delphes-3.0.9.1/'+signal+'_'+mass+'[AB]*'+pileup+'*root')
             theInputFileList=relBase+'/src/JohnStupak/snowmass/ntuples/'+theName+'.txt'
             f=open(theInputFileList,'w')
             for file in inputFiles:
