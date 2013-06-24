@@ -1,17 +1,20 @@
 #include <stdlib.h>
 
-runIt(char* fileList){
+runItBatch(char* fileList){
   TString cmsswBase(getenv("CMSSW_BASE"));
 
   TString command(".L ");
-  command+=cmsswBase+TString("/libDelphes.so");
+  command+=cmsswBase+TString("/src/JohnStupak/snowmass/libDelphes.so");
   gROOT->ProcessLine(command);
 
   command=TString(".include ");
   command+=cmsswBase+TString("/src/JohnStupak/snowmass/external");
   gROOT->ProcessLine(command.Data());
 
-  gROOT->ProcessLine(".L twoHiggsDoublet.cpp+");
+  //TString command(".L ");
+  //command+=cmsswBase+TString("/src/JohnStupak/snowmass/twoHiggsDoublet.cpp+");
+  TString command(".L twoHiggsDoublet.cpp+");
+  gROOT->ProcessLine(command);
 
   //---------------------------------------------------------------
 
