@@ -1405,8 +1405,6 @@ dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmas
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_263932213.txt
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_263973020.root
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_263973020.txt
-dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_264325337.root
-dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_264325337.txt
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_264427048.root
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_264427048.txt
 dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/Bj-4p-3700-100000-v1510_14TEV/Bj-4p-3700-100000-v1510_14TEV_NoPileUp_264524109.root
