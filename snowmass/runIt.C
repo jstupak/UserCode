@@ -11,6 +11,12 @@ runIt(){
   gROOT->ProcessLine(".L twoHiggsDoublet.cpp+");
   
   vector<TString> inputs;
+  
+  inputs.push_back("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/HTBinned/Delphes-3.0.9.1/NoPileUp/tt-4p-0-600-v1510_14TEV/tt-4p-0-600-v1510_14TEV_NoPileUp_367806908.root");
+  
+  //inputs.push_back("/eos/uscms/store/user/jstupak/snowmass/14TeV/Delphes-3.0.9/HZZ_14TEV_300_NoPileUp.root");
+
+  /*
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7694.root"));
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7829.root"));
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_7900.root"));
@@ -27,6 +33,7 @@ runIt(){
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_95961970.root"));
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_9630.root"));
   inputs.push_back(TString("dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/snowmass/Delphes-3.0.9/NoPileUp/WJETS_13TEV/WJETS_13TEV_NoPileUp_98103320.root"));
+  */
   
-    run(inputs);
+  run(inputs);
 }
