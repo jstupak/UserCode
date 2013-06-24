@@ -13,7 +13,6 @@ doSignal=True
 
 analysisOutputDir='/uscms_data/d1/jstupak/2hdm'
 
-rootScript=relBase+"/src/JohnStupak/snowmass/runIt.batch.C"
 condorJobTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.job"
 condorScriptTempl=relBase+"/src/JohnStupak/snowmass/twoHiggsDoublet.templ.csh"
 
@@ -26,6 +25,9 @@ cTime=datetime.now()
 date=str(cTime.year)+'_'+str(cTime.month)+'_'+str(cTime.day)
 
 condorDir=analysisOutputDir+'/'+date
+
+#Make sure twoHiggsDoublet.cpp is pre-compiled
+#os.system('root -l -b -q compile.C')
 
 if len(sys.argv)==2:
     submissionID=sys.argv[1]
