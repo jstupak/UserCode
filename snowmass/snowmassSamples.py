@@ -63,10 +63,16 @@ class Sample:
         return chain.GetEntries()
 
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
-    def setCrossSection(self, beta=0, cosBetaMinusAlpha=0, twoHDMType=1):
-        self.crossSection=None
 
+    def setCrossSection(self, beta=0, cosBetaMinusAlpha=0, twoHDMType=1):
+        self.crossSection=self.getCrossSection(beta,cosBetaMinusAlpha,twoHDMType)
+                
+    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def getCrossSection(self, beta=0, cosBetaMinusAlpha=0, twoHDMType=1):
+
+        crossSection=None
+            
         if self.isSignal:
             particle=self.name[0]
             E=self.name.split('_')[1].split('T')[0]
@@ -76,9 +82,15 @@ class Sample:
             for line in open(crossSectionFile):
                 cBMA=float(line.split()[0])
                 B=float(line.split()[1])
-                if abs((beta-B)/beta)<.0001 and abs((cosBetaMinusAlpha-cBMA)/cosBetaMinusAlpha)<.000001:
-                    self.crossSection=float(line.split()[2])
-                    break
+                if abs((beta-B)/beta)<.0001:
+                    rightAlpha=False
+                    try:
+                        if abs((cosBetaMinusAlpha-cBMA)/cosBetaMinusAlpha)<.000001: rightAlpha=True
+                    except ZeroDivisionError:
+                        if cBMA<.000001: rightAlpha=True
+                    if rightAlpha:
+                        crossSection=float(line.split()[2])
+                        break
                 
             if 'HWW' in self.name: finalState='WW'
             elif 'HZZ' in self.name: finalState='ZZ'
@@ -90,22 +102,31 @@ class Sample:
                 for line in open(BRFile):
                     cBMA=float(line.split()[0])
                     B=float(line.split()[1])
-                    if abs((beta-B)/beta)<.0001 and abs((cosBetaMinusAlpha-cBMA)/cosBetaMinusAlpha)<.000001:
-                        br=float(line.split()[2])
-                        if finalState=='ZZ' and '4l' in self.name: br*=((2*.03363738)**2)
-
-                        self.crossSection*=br
-                        break
-            except: self.crossSection=0
-
+                    if abs((beta-B)/beta)<.0001:
+                        rightAlpha=False
+                        try:
+                            if abs((cosBetaMinusAlpha-cBMA)/cosBetaMinusAlpha)<.000001: rightAlpha=True
+                        except ZeroDivisionError:
+                            if abs(cBMA)<.000001: rightAlpha=True
+                        if rightAlpha:
+                            br=float(line.split()[2])
+                            if finalState=='ZZ' and '4l' in self.name:
+                                br*=((2*.03363738)**2)
+                            crossSection*=br
+                            break
+            except: crossSection=0
         else:
             for line in open(relBase+'/src/JohnStupak/snowmass/crossSections.txt'):
                 sampleName=line.split('|')[1].strip()
                 if '_'.join(self.name.split('_')[0:2])==sampleName:
-                    self.crossSection=float(line.split('|')[3].strip())
+                    crossSection=float(line.split('|')[3].strip())
                     break
 
-        if not self.crossSection: print "WARNING: Could not find cross section for sample",self.name
+        if not crossSection:
+            print "WARNING: Could not find cross section for sample",self.name
+
+        #print crossSection
+        return crossSection
         
 ################################################################################################################################################
 
@@ -224,14 +245,20 @@ for pileup in pileups:
         for signal in signals:
             theName=signal+'_'+mass+'_'+pileup+'PileUp'
 
-            inputFiles=glob('/eos/uscms/store/user/jstupak/snowmass/Delphes-3.0.9.1/'+signal+'_'+mass+'[AB]*'+pileup+'*root')
-            theInputFileList=relBase+'/src/JohnStupak/snowmass/ntuples/'+theName+'.txt'
+            if signal[:3]=='HZZ': altName='H #rightarrow ZZ (m = '
+            elif signal[:3]=='HWW': altName='H #rightarrow WW (m = '
+            elif signal[:3]=='AZh': altName='A #rightarrow Zh (m = '
+            altName+=mass+' GeV)'
+            
+            inputFiles=glob('/uscms_data/d3/jstupak/delphes/output/'+signal+'_'+mass+'[AB]*'+pileup+'*root')
+            theInputFileList=theName+'.txt'
+
             f=open(theInputFileList,'w')
             for file in inputFiles:
                 f.write(file+'\n')
             f.close()
 
-            signal=Sample(name=theName,sampleType='signal',inputListFile=theInputFileList)
+            signal=Sample(name=theName,sampleType='signal',inputListFile=theInputFileList,altName=altName)
             allSamples.append(signal)
             
                     
@@ -248,7 +275,7 @@ for pileup in pileups:
         #else: theType='ewk'
 
         if background[0]=='t': theType='top'
-        elif background[0:3]=='Bjj' or background[0]=='H': theType='other'
+        elif background[0]=='H': theType='other'
         else: theType='ewk'
 
         allSamples.append(Sample(name=theName,sampleType=theType,filesPerJob=40,inputListFile=theInputFileList))
